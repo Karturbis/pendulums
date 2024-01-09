@@ -1,5 +1,4 @@
 # Gravitational Accelerations:
-
 gravityaccel = {
     "merkur": 3.70, 
     "venus": 8.87, 
@@ -19,3 +18,6 @@ gravityaccel = {
     "uranus": 8.87, 
     "neptun": 11.15
     }
+
+# Windowsize:
+windowsize = (800, 400)

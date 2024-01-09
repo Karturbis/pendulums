@@ -4,6 +4,8 @@ import data # Imports the data from the data.py file, this includes the gravitat
 pygame.init() # Initialize pygame
 
 
+screen = pygame.display.set_mode(data.windowsize)
+
 
 
 
