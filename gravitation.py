@@ -1,25 +1,21 @@
 # Gravitational Accelerations:
-merkuraccel = 3.70 # m/s²
 
-venusaccel = 8.87 # m/s²
-
-earthaccel = 9.81 # m/s²
-moonaccel = 1.62 # m/s²
-
-marsaccel = 3.73 # m/s²
-phobosaccel = 0.006 # m/s²
-deimosaccel = 0.003 # m/s²
-
-jupiteraccel = 24.97 # m/s²
-ioaccel = 1.80 # m/s²
-ganymedeaccel = 1.43 # m/s²
-europaaccel = 1.31 # m/s²
-callistoaccel = 1.24 # m/s²
-
-saturnaccel = 10.44 # m/s²
-titanaccel = 1.35 # m/s²
-rheaaccel = 0.26 # m/s²
-
-uranusaccel = 8.87 # m/s²
-
-neptunaccel = 11.15 # m/s²
+gravityaccel = {
+    "merkur": 3.70, 
+    "venus": 8.87, 
+    "earth": 9.81, 
+    "moon": 1.62, 
+    "mars": 3.73, 
+    "phobos": 0.006, 
+    "deimos": 0.003, 
+    "jupiter": 24.97, 
+    "io": 1.80, 
+    "ganymede": 1.43, 
+    "europa": 1.31, 
+    "callisto": 1.24, 
+    "saturn": 10.44, 
+    "titan": 1.35, 
+    "rhea": 0.26, 
+    "uranus": 8.87, 
+    "neptun": 11.15
+    }
