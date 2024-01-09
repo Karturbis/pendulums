@@ -24,7 +24,6 @@ saturnaccel = 10.44 # m/s²
 titanaccel = 1.35 # m/s²
 rheaaccel = 0.26 # m/s²
 
-
 uranusaccel = 8.87 # m/s²
 
 neptunaccel = 11.15 # m/s²
