@@ -3,8 +3,8 @@ import pygame
 pygame.init() # Initialize pygame
 
 # Global Variables:
-gravitaccel = 9.81
-
+earthaccel = 9.81 # m/s²
+moonaccel = 1.62 # m/s²
 
 
 
