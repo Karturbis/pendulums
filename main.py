@@ -1,5 +1,5 @@
 import pygame
-import gravitation # Imports the variables with the gravitational values
+import dicts # Imports the dict with the gravitational values
 
 pygame.init() # Initialize pygame
 
