@@ -5,7 +5,7 @@ import data # Imports the data from the data.py file, this includes the gravitat
 
 pygame.init() # Initialize pygame
 
-
+clock = pygame.time.Clock()
 screen = pygame.display.set_mode((400, 600))
 pygame.display.set_caption("pendulums")
 
@@ -20,7 +20,8 @@ def gameloop():
                 pygame.quit()
                 exit(0)
 
-    pygame.display.update()
+        screen.fill([140, 42, 120])
+        pygame.display.update()
 
 
 
@@ -35,4 +36,5 @@ def gameloop():
 
 if __name__ == "__main__":
     """The following code gets executed, if this file is executed"""
+    gameloop()
     
