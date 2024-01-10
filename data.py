@@ -27,4 +27,4 @@ gravityaccel = {
     }
 
 # Windowsize:
-windowsize = (800, 400)
+windowsize = (1900, 860)
