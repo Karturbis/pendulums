@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-import data # Imports the data from the data.py file, this includes the gravitational vlaues.
+import data # Imports the data from the data.py file, this includes the gravitational vlaues and the window size.
 
 pygame.init() # Initialize pygame
 
