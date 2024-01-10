@@ -27,7 +27,7 @@ if __name__ == "__main__":
     """The following code gets executed, if this file is executed"""
 
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((400, 600))
+    screen = pygame.display.set_mode(data.windowsize)
     pygame.display.set_caption("Pendulums")
 
 
