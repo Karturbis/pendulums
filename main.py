@@ -24,7 +24,7 @@ def gameloop():
     
     while True: # This loop runs the game until it is stopped
 
-        for event in pygame.event.get(): # for statement to close the window and end the game, if the pygame event is quit
+        for event in pygame.event.get(): # for statement, to close the window and end the game if the pygame event is quit
             if event.type == QUIT:
                 pygame.quit()
                 exit(0)
