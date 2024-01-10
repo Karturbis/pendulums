@@ -16,7 +16,14 @@ gravityaccel = {
     "titan": 1.35, 
     "rhea": 0.26, 
     "uranus": 8.87, 
-    "neptun": 11.15
+    "titania": 0.37,
+    "oberon": 0.35,
+    "ariel": 0.25,
+    "umbriel": 0.25,
+    "neptune": 11.15,
+    "triton": 0.78,
+    "proteus": 0.07,
+    "nereid": 0.07
     }
 
 # Windowsize:
