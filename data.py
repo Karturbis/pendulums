@@ -28,3 +28,7 @@ gravityaccel = {
 
 # Windowsize:
 windowsize = (1900, 860)
+
+# Place of the pendulum fixpoint:
+x_fixpoint_position = 200
+y_fixpoint_position = 200
