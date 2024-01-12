@@ -3,6 +3,10 @@ from pygame.locals import *
 
 import data # Imports the data from the data.py file, this includes the gravitational vlaues and the window size.
 
+class PeendulumWeight:
+    def __init__(self):
+        pass
+
 
 def gameloop():
     """This method contains the game loop, which runs until the game is stopped,
