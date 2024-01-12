@@ -5,13 +5,21 @@ from pygame.locals import *
 
 import data # Imports the data from the data.py file, this includes the gravitational vlaues and the window size.
 
-class PeendulumWeight:
+class Pendulum:
+    
+    # Position of the loose end of the pendulum:
+    x_pendulum_posi = 0
+    y_pendulum_posi = 0
 
-    def __init__(self, x_position, y_position):
-        self.x_position = x_position
-        self.y_position = y_position
+    def pendulum_position(self, length, angle):
+        pass
+        #TODO: add position calculation algorythm
+        self.x_position = length
+        self.y_position = angle
 
-class PendulumCord:
+class PeendulumWeight(Pendulum):
+    pass
+class PendulumCord(Pendulum):
 
     def __init__(self, angle, length):
         self.x_fixpoint_position = data.x_fixpoint_position
@@ -41,9 +49,7 @@ def gameloop():
         pygame.display.update()
 
 
-def pendulum_position(length, angle):
-    pass
-    #TODO: add position calculation algorythm
+
 
 
 if __name__ == "__main__":
