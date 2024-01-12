@@ -29,6 +29,11 @@ gravityaccel = {
 # Windowsize:
 windowsize = (1900, 860)
 
-# Place of the pendulum fixpoint:
+# Position of the pendulum(cord) fixpoint:
 x_fixpoint_position = 200
 y_fixpoint_position = 200
+
+# Position of the target:
+x_target_min = 100
+x_target_max = 200
+y_target = 300
