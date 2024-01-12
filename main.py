@@ -1,11 +1,26 @@
 import pygame
+import random
 from pygame.locals import *
 
 import data # Imports the data from the data.py file, this includes the gravitational vlaues and the window size.
 
 class PeendulumWeight:
+
+    def __init__(self, x_position, y_position):
+        self.x_position = x_position
+        self.y_position = y_position
+
+class PendulumCord:
+
     def __init__(self):
-        pass
+        self.x_fixpoint_position = data.x_fixpoint_position
+        self.y_fixpoint_position = data.y_fixpoint_position
+
+class Target:
+
+    def __init__(self):
+        self.x_position = random.randint(data.x_target_min, data.x_target_max)
+        self.y_position = data.y_target
 
 
 def gameloop():
