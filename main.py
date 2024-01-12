@@ -41,6 +41,10 @@ def gameloop():
         pygame.display.update()
 
 
+def pendulum_position(length, angle):
+    pass
+    #TODO: add position calculation algorythm
+
 
 if __name__ == "__main__":
     """The following code gets executed, if this file is executed"""
