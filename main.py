@@ -34,6 +34,7 @@ gravityaccel = {
 windowsize = (1900, 860)
 background_color = (140, 42, 120)
 pen_cord_color =(255, 21, 240)
+pen_weight_color = (75, 200, 72)
 
 fps = 60
 
@@ -49,29 +50,28 @@ y_target = 300
 
 
 class Pendulum:
-    
-    # Position of the loose end of the pendulum:
-    pendulum_posi = [0, 0]
+    pass
 
-    def pendulum_position(self, length, angle):
-        #TODO: add position calculation algorythm
-        self.pendulum_posi = [length, angle]
+class PendulumWeight(Pendulum):
 
-
-class PeendulumWeight(Pendulum):
+    def __init__(self):
+        pass
     
     def detach(self):
-        pass
+        print("detach!")
+    
+    def draw(self, pendulum_posi):
+        pygame.draw.circle(screen, pen_weight_color, pendulum_posi, 42)
 
 
 class PendulumCord(Pendulum):
 
-    def __init__(self, angle, length):
+    def __init__(self):
         #self.fixpoint_position = fixpoint_position
         pass
 
-    def draw():
-        pendulum_posi = [pygame.time.get_ticks()%1000, pygame.time.get_ticks()%1000]
+    def draw(self, pendulum_posi):
+        
         pygame.draw.line(screen, pen_cord_color, fixpoint_position, pendulum_posi)
 
 
@@ -88,7 +88,10 @@ def gameloop():
     every frame of the game."""
     
     done = False
-    pencord
+    
+    pendulum = Pendulum()
+    pencord = PendulumCord()
+    penweight = PendulumWeight
 
     while not done: # This loop runs the game until it is stopped
 
@@ -97,10 +100,13 @@ def gameloop():
                 done = True
             
             if event.type == pygame.KEYDOWN:
-                PeendulumWeight.detach
+                penweight.detach(penweight)
 
+        
+        pendulum_posi = [pygame.time.get_ticks()%1000, pygame.time.get_ticks()%1000]
         screen.fill(background_color)
-        PendulumCord.draw()
+        pencord.draw(pendulum_posi)
+        penweight.draw(penweight, pendulum_posi)
         pygame.display.update()
         
         clock.tick(fps)
