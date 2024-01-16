@@ -31,8 +31,9 @@ gravityaccel = {
     "nereid": 0.07
     }
 
-# Windowsize:
+
 windowsize = (1900, 860)
+background_color = (140, 42, 120)
 
 # Position of the pendulum(cord) fixpoint:
 x_fixpoint_position = 200
@@ -77,12 +78,12 @@ def gameloop():
     
     while True: # This loop runs the game until it is stopped
 
-        for event in pygame.event.get(): # for statement, to close the window and end the game if the pygame event is quit
-            if event.type == QUIT:
+        for event in pygame.event.get(): # for statement to check for events
+            if event.type == QUIT: # event to exit the game (this event is triggered, if the x button of the window is clicked)
                 pygame.quit()
                 exit(0)
 
-        screen.fill([140, 42, 120])
+        screen.fill(background_color)
         pygame.display.update()
 
 
