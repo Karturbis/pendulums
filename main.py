@@ -31,37 +31,48 @@ gravityaccel = {
     "nereid": 0.07
     }
 
-
 windowsize = (1900, 860)
 background_color = (140, 42, 120)
+pen_cord_color =(255, 21, 240)
+
+fps = 60
+
+
 
 # Position of the pendulum(cord) fixpoint:
-x_fixpoint_position = 200
-y_fixpoint_position = 200
+fixpoint_position = (400, 200)
 
 # Position of the target:
 x_target_min = 100
 x_target_max = 200
 y_target = 300
+
+
 class Pendulum:
     
     # Position of the loose end of the pendulum:
-    x_pendulum_posi = 0
-    y_pendulum_posi = 0
+    pendulum_posi = [0, 0]
 
     def pendulum_position(self, length, angle):
-        pass
         #TODO: add position calculation algorythm
-        self.x_position = length
-        self.y_position = angle
+        self.pendulum_posi = [length, angle]
+
 
 class PeendulumWeight(Pendulum):
-    pass
+    
+    def detach(self):
+        pass
+
+
 class PendulumCord(Pendulum):
 
     def __init__(self, angle, length):
-        self.x_fixpoint_position = x_fixpoint_position
-        self.y_fixpoint_position = y_fixpoint_position
+        #self.fixpoint_position = fixpoint_position
+        pass
+
+    def draw():
+        pendulum_posi = [pygame.time.get_ticks()%1000, pygame.time.get_ticks()%1000]
+        pygame.draw.line(screen, pen_cord_color, fixpoint_position, pendulum_posi)
 
 
 class Target:
@@ -76,19 +87,26 @@ def gameloop():
     it contains all the calls to functions and methods, that have to be called
     every frame of the game."""
     
-    while True: # This loop runs the game until it is stopped
+    done = False
+    pencord
+
+    while not done: # This loop runs the game until it is stopped
 
         for event in pygame.event.get(): # for statement to check for events
-            if event.type == QUIT: # event to exit the game (this event is triggered, if the x button of the window is clicked)
-                pygame.quit()
-                exit(0)
+            if event.type == pygame.QUIT: # event to exit the game (this event is triggered, if the x button of the window is clicked)
+                done = True
+            
+            if event.type == pygame.KEYDOWN:
+                PeendulumWeight.detach
 
         screen.fill(background_color)
+        PendulumCord.draw()
         pygame.display.update()
+        
+        clock.tick(fps)
 
-
-
-
+    pygame.quit()
+    exit(0)
 
 if __name__ == "__main__":
     """The following code gets executed, if this file is executed"""
@@ -102,8 +120,6 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(windowsize)
     pygame.display.set_caption("Pendulums")
-    
-
 
     gameloop()
     
