@@ -1,5 +1,6 @@
 import pygame
 import random
+from pygame.locals import *
 
 class Target:
 
@@ -57,27 +58,56 @@ class Game:
 
 pygame.init()
 pygame.display.set_caption("Pendulums")
+font = pygame.font.Font(None, 32)
 windowsize = (1900, 860)
 screen = pygame.display.set_mode(windowsize)
 background_color = (42, 255, 42)
 target_color = (255, 42, 42)
-
+gamestart = True
+maingame = False
+endgame = False
+inputangle = ""
 clock = pygame.time.Clock()
 fps = 60
-
-done = False
 
 pendulum = Pendulum()
 game = Game()
 target = Target()
 
+while gamestart:
 
-while not done:
+    for event in pygame.event.get():
+    
+        if event.type == pygame.QUIT:
+            gamestart = False
+
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_RETURN:
+
+                try:
+                    inputangle = int(inputangle)
+                except Exception as e:
+                    pass
+                gamestart = False
+                maingame = True
+
+            elif event.key == pygame.K_BACKSPACE:
+                inputangle = inputangle[:-1]
+            
+            else:
+                inputangle += event.uniode
+    
+    screen.fill((20, 20, 20))
+    text_render = font(inputangle, True, (255, 255, 255))
+    screen.flip()
+
+while maingame:
 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
-            done = True
+            maingame = False
         
         if event.type == pygame.KEYDOWN:
             pendulum.detach
