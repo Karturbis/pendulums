@@ -1,12 +1,15 @@
 import pygame
+import random
 
 class Target:
 
     def __init__(self):
-        pass
+        self.position = (random.randint(1200, 1700), 840)
+        self.width = 100
+        self.height = 20
 
     def draw(self):
-        pass
+        pygame.draw.rect(screen, target_color,(self.position, (self.width, self.height)))
 
     def collision(self):
         pass
@@ -25,6 +28,9 @@ class Pendulum:
         throw = Throw()
         return throw
     
+    def draw(self):
+        pass
+    
 
 class Throw:
     """This class represents the pendulum weight, when it is detached from the pendulum."""
@@ -42,9 +48,9 @@ class Game:
         pass
 
     def draw(self):
-        Target.draw
+        target.draw()
         if pendulum.detached:
-            Throw.draw()
+            throw.draw()
         pendulum.draw()
         
 
@@ -54,6 +60,7 @@ pygame.display.set_caption("Pendulums")
 windowsize = (1900, 860)
 screen = pygame.display.set_mode(windowsize)
 background_color = (42, 255, 42)
+target_color = (255, 42, 42)
 
 clock = pygame.time.Clock()
 fps = 60
