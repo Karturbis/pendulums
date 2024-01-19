@@ -57,10 +57,12 @@ class Game:
 
 
 pygame.init()
+pygame.font.init()
 pygame.display.set_caption("Pendulums")
-font = pygame.font.Font(None, 32)
 windowsize = (1900, 860)
 screen = pygame.display.set_mode(windowsize)
+font = pygame.font.SysFont('freesanbold.ttf', 50)
+
 background_color = (42, 255, 42)
 target_color = (255, 42, 42)
 gamestart = True
