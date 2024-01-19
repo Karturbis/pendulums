@@ -57,11 +57,9 @@ class Game:
 
 
 pygame.init()
-pygame.font.init()
 pygame.display.set_caption("Pendulums")
 windowsize = (1900, 860)
 screen = pygame.display.set_mode(windowsize)
-font = pygame.font.SysFont('freesanbold.ttf', 50)
 
 background_color = (42, 255, 42)
 target_color = (255, 42, 42)
@@ -99,9 +97,7 @@ while gamestart:
             
             else:
                 inputangle += event.uniode
-    
-    screen.fill((20, 20, 20))
-    text_render = font(inputangle, True, (255, 255, 255))
+                
     screen.flip()
 
 while maingame:
