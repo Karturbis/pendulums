@@ -5,12 +5,12 @@ from pygame.locals import *
 class Target:
 
     def __init__(self):
-        self.position = (random.randint(1200, 1700), 840)
-        self.width = 100
-        self.height = 20
+        self.__position = (random.randint(1200, 1700), 840)
+        self.__width = 100
+        self.__height = 20
 
     def draw(self):
-        pygame.draw.rect(screen, target_color,(self.position, (self.width, self.height)))
+        pygame.draw.rect(screen, target_color,(self.__position, (self.__width, self.__height)))
 
     def collision(self):
         pass
@@ -18,17 +18,20 @@ class Target:
 
 class Pendulum:
     
-    detached = False
+    __detached = False
 
     def __init__(self):
-        detached = False
+        self.__detached = False
 
     def detach(self):
         
-        self.detached = True
+        self.__detached = True
         throw = Throw()
         return throw
     
+    def get_detached(self):
+        return self.__detached
+
     def draw(self):
         pass
     
@@ -36,8 +39,8 @@ class Pendulum:
 class Throw:
     """This class represents the pendulum weight, when it is detached from the pendulum."""
     def __init__(position, velocity):
-        self.position = position
-        self.velocity = velocity
+        self.__position = position
+        self.__velocity = velocity
 
     def collision(self):
         pass
@@ -50,23 +53,19 @@ class Game:
 
     def draw(self):
         target.draw()
-        if pendulum.detached:
+        if pendulum.get_detached():
             throw.draw()
         pendulum.draw()
         
 
 
-pygame.init()
-pygame.display.set_caption("Pendulums")
-windowsize = (1900, 860)
-screen = pygame.display.set_mode(windowsize)
 
 background_color = (42, 255, 42)
 target_color = (255, 42, 42)
 gamestart = True
 maingame = False
 endgame = False
-inputangle = ""
+
 clock = pygame.time.Clock()
 fps = 60
 
@@ -74,31 +73,24 @@ pendulum = Pendulum()
 game = Game()
 target = Target()
 
+
+inputangle = input("Please enter the angle (in degrees), at which the pendulum starts its movement.\n> ")
 while gamestart:
 
-    for event in pygame.event.get():
-    
-        if event.type == pygame.QUIT:
-            gamestart = False
+    try:
+        inputangle = int(inputangle)
+        gamestart = False
+        maingame = True
+    except Exception as e:
+        inputangle = input("Please enter a positive whole number, without any other symbols.\n> ")
 
-        if event.type == pygame.KEYDOWN:
+print(inputangle)
 
-            if event.key == pygame.K_RETURN:
+pygame.init()
+pygame.display.set_caption("Pendulums")
+windowsize = (1900, 860)
+screen = pygame.display.set_mode(windowsize)
 
-                try:
-                    inputangle = int(inputangle)
-                except Exception as e:
-                    pass
-                gamestart = False
-                maingame = True
-
-            elif event.key == pygame.K_BACKSPACE:
-                inputangle = inputangle[:-1]
-            
-            else:
-                inputangle += event.uniode
-                
-    screen.flip()
 
 while maingame:
 
