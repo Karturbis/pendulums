@@ -2,7 +2,12 @@ import pygame
 import random
 from pygame.locals import *
 
+
 class Target:
+
+
+    """This class represents the target, which
+    has to be hitted by the thrown pendulum."""
 
     def __init__(self):
         self.__position = (random.randint(1200, 1700), 840)
@@ -10,21 +15,29 @@ class Target:
         self.__height = 20
 
     def draw(self):
-        pygame.draw.rect(screen, target_color,(self.__position, (self.__width, self.__height)))
+        pygame.draw.rect(
+            screen, target_color,
+            (self.__position,
+            (self.__width, self.__height)
+            )
+        )
 
     def collision(self):
         pass
 
 
 class Pendulum:
-    
+
+
+    """Class that represents the pendulum cordand the pendulum weight,
+    until the weight is detached. Then it only represents the cord."""
+
     __detached = False
 
     def __init__(self):
         self.__detached = False
 
     def detach(self):
-        
         self.__detached = True
         throw = Throw()
         return throw
@@ -37,7 +50,13 @@ class Pendulum:
     
 
 class Throw:
-    """This class represents the pendulum weight, when it is detached from the pendulum."""
+
+
+    """This class represents the pendulum weight when it is
+    detached from the pendulum. It simulates an oblique throw,
+    with the start position and velocity, which the pendulum
+    had, when it was detached."""
+
     def __init__(position, velocity):
         self.__position = position
         self.__velocity = velocity
@@ -45,10 +64,16 @@ class Throw:
     def collision(self):
         pass
 
+
 class Game:
 
+
+    """The game class redirects some tasks to the more
+    specific classes and also does some tasks itself."""
+
     def simulate(self):
-        """This method calculates the position of all the objects in the game."""
+        """This method calculates the position
+        of all the objects in the game."""
         pass
 
     def draw(self):
@@ -57,24 +82,28 @@ class Game:
             throw.draw()
         pendulum.draw()
         
-
-
-
+# Colors:
 background_color = (42, 255, 42)
 target_color = (255, 42, 42)
+
+# Gamestate:
 gamestart = True
 maingame = False
 endgame = False
 
+# Pygame time management:
 clock = pygame.time.Clock()
 fps = 60
 
+# Object creation:
 pendulum = Pendulum()
 game = Game()
 target = Target()
 
-
-inputangle = input("Please enter the angle (in degrees), at which the pendulum starts its movement.\n> ")
+# Start of the game:
+inputangle = input(
+    "Please enter the angle (in degrees), at which the pendulum starts its movement.\n> "
+)
 while gamestart:
 
     try:
@@ -82,17 +111,21 @@ while gamestart:
         gamestart = False
         maingame = True
     except Exception as e:
-        inputangle = input("Please enter a positive whole number, without any other symbols.\n> ")
+        inputangle = input(
+            "Please enter a positive whole number, without any other symbols.\n> "
+        )
 
-print(inputangle)
 
+# Init of pygame and the window:
 pygame.init()
 pygame.display.set_caption("Pendulums")
 windowsize = (1900, 860)
 screen = pygame.display.set_mode(windowsize)
 
 
+# Main game loop:
 while maingame:
+
 
     for event in pygame.event.get():
 
@@ -110,6 +143,6 @@ while maingame:
     pygame.display.flip()
     clock.tick(fps)
 
-
+# End of the game:
 pygame.quit()
 exit(0)
