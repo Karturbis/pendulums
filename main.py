@@ -91,6 +91,9 @@ class Throw:
     def collision(self):
         pass
 
+    def draw(self):
+        pass
+
 
 class Game:
 
