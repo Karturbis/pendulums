@@ -1,3 +1,13 @@
+"""
+In this simulation:
+In real life:        In this simulation:
+
+1 Meter         =   1 Pixel / zoom => 1Pixel = 1Meter*zoom
+1 Sekunde       =   1 Sekunde (60 frames)
+
+In the physics calculations, SI-units are used.
+"""
+
 import math
 import random
 import pygame
@@ -45,8 +55,8 @@ YELLOW = (255, 194, 0)
 
 background_color = GREEN
 target_color = YELLOW
-
-time_seconds = 1
+planet = "earth"
+zoom = 100
 
 
 class Target:
@@ -78,33 +88,42 @@ class Pendulum:
     """Class that represents the pendulum cord and the pendulum weight,
     until the weight is detached. Then it only represents the cord."""
 
-    __cord_len = 200
-    __detached = False
+    __cord_len = 2 # in meter
     pendulum_fixpoint = (400, 200)
 
     def __init__(self):
         self.__detached = False
-        self.__oscillation_period = 2*math.pi*math.sqrt(self.__cord_len/gravity_accel["earth"])
-        self.angle = math.radians(input_angle)
+        self.__velocity_arc = 0 # the velocity, the pendulum has on the curved x-achsis (arc)
+        self.__oscillation_period = ( 
+            2*math.pi*math.sqrt((self.__cord_len) / gravity_accel[planet]) # time that the pendulum needs to oscillate one time
+        )
+        self.__angle = math.radians(input_angle) # angle is defined in radians
+        self.__displacement_arc = self.__angle * self.__cord_len # displacement on the curved x-achsis (arc)
         self.simulate()
 
     def detach(self):
+        alpha = 90 - self.__angle
+        self.__velocity = (
+            math.cos(alpha)*self.__velocity_arc, math.sin(alpha)*self.__velocity_arc
+        )
         self.__detached = True
-        throw = Throw(self.__position, self.velocity)
-        return throw
+        game.make_throw(self.__position, self.__velocity)
     
     def get_detached(self):
         return self.__detached
 
     def get_position(self):
-        return self.__position
+        return self.__position # in pixels
 
     def simulate(self):
 
-        # claculate the angle
-        self.__position = (
-            self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.angle),
-            self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.angle)
+        self.__acceleration_arc = -gravity_accel[planet] * math.sin(self.__displacement_arc/self.__cord_len)
+        self.__velocity_arc += self.__acceleration_arc/fps # see comment below:
+        self.__displacement_arc += self.__velocity_arc/fps # dividing by fps to get seconds in the calculation. E.G if this is done 60 times per second, the displacement is raised by the velocity (m/s²) every second.
+        self.__angle = self.__displacement_arc/self.__cord_len
+        self.__position = ( # in pixels:
+            self.pendulum_fixpoint[0] + self.__cord_len*zoom*math.sin(self.__angle),
+            self.pendulum_fixpoint[1] + self.__cord_len*zoom*math.cos(self.__angle)
             )
 
     def draw(self):
@@ -121,7 +140,7 @@ class Throw:
     with the start position and velocity, which the pendulum
     had, when it was detached."""
 
-    def __init__(position, velocity):
+    def __init__(self, position, velocity):
         self.__position = position
         self.__velocity = velocity
 
@@ -129,7 +148,7 @@ class Throw:
         pass
 
     def draw(self):
-        pass
+        pygame.draw.circle(screen, WHITE, self.__position, 42)
 
 
 class Game:
@@ -137,6 +156,7 @@ class Game:
 
     """The game class redirects some tasks to the more
     specific classes and also does some tasks itself."""
+
 
     def simulate(self):
 
@@ -148,7 +168,7 @@ class Game:
     def draw(self):
         target.draw()
         if pendulum.get_detached():
-            throw.draw()
+            self.throw.draw()
         else:
             pendulum.draw()
         self.draw_pendulum_cord()
@@ -157,6 +177,9 @@ class Game:
         position = pendulum.get_position()
 
         pygame.draw.line(screen, WHITE, position, Pendulum.pendulum_fixpoint, 8)
+
+    def make_throw(self, position, velocity):
+        self.throw = Throw(position, velocity)
 
 # Gamestate:
 start_game = True
@@ -216,7 +239,9 @@ while main_game:
             end_game = True
         
         if event.type == pygame.KEYDOWN:
-            pendulum.detach
+            print("LOG: KEYDON")
+            pendulum.detach()
+            
 
 
     screen.fill(background_color)
