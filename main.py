@@ -1,5 +1,6 @@
-import pygame
+import math
 import random
+import pygame
 from pygame.locals import *
 
 # Gravitational Accelerations:
@@ -55,7 +56,7 @@ class Target:
     has to be hitted by the thrown pendulum."""
 
     def __init__(self):
-        self.__position = (random.randint(1200, 1700), 840) # REDO TO randint(1200, 1700), 840
+        self.__position = (random.randint(1200, 1700), 840)
         self.__width = 900
         self.__height = 900
 
@@ -77,11 +78,13 @@ class Pendulum:
     """Class that represents the pendulum cord and the pendulum weight,
     until the weight is detached. Then it only represents the cord."""
 
+    __cord_len = 100
     __detached = False
 
     def __init__(self):
         self.__detached = False
-        self.__position = (input_angle ,42)
+        self.angle = math.radians(input_angle)
+        simulate()
         print(self.__position)
 
     def detach(self):
@@ -93,7 +96,7 @@ class Pendulum:
         return self.__detached
 
     def simulate(self):
-        pass
+        self.__position = ()
 
     def draw(self):
         pygame.draw.circle(screen, WHITE, self.__position, 42)
