@@ -78,7 +78,7 @@ class Pendulum:
     """Class that represents the pendulum cord and the pendulum weight,
     until the weight is detached. Then it only represents the cord."""
 
-    __cord_len = 100
+    __cord_len = 200
     __detached = False
     pendulum_fixpoint = (200, 200)
 
@@ -202,7 +202,6 @@ while main_game:
     game.draw()
     pygame.display.flip()
     clock.tick(fps)
-    time_seconds = pygame.time.get_ticks()
 
 # The end of the game loop
 while end_game:
