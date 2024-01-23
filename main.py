@@ -3,7 +3,7 @@ import random
 from pygame.locals import *
 
 # Gravitational Accelerations:
-gravityaccel = {
+gravity_accel = {
     "merkur": 3.70, 
     "venus": 8.87, 
     "earth": 9.81, 
@@ -56,24 +56,28 @@ class Target:
 class Pendulum:
 
 
-    """Class that represents the pendulum cordand the pendulum weight,
+    """Class that represents the pendulum cord and the pendulum weight,
     until the weight is detached. Then it only represents the cord."""
 
     __detached = False
 
     def __init__(self):
         self.__detached = False
+        self.__position = (input_angle, input_angle)
 
     def detach(self):
         self.__detached = True
-        throw = Throw()
+        throw = Throw(self.__position, self.velocity)
         return throw
     
     def get_detached(self):
         return self.__detached
 
-    def draw(self):
+    def simulate(self):
         pass
+
+    def draw(self):
+        pygame.draw.circle(screen, (255, 255, 255), self.__position, 42)
     
 
 class Throw:
@@ -116,32 +120,29 @@ class Game:
 background_color = (42, 255, 42)
 target_color = (255, 42, 42)
 
+
 # Gamestate:
-gamestart = True
-maingame = False
-endgame = False
+start_game = True
+main_game = False
+end_game = False
 
 # Pygame time management:
 clock = pygame.time.Clock()
 fps = 60
 
-# Object creation:
-pendulum = Pendulum()
-game = Game()
-target = Target()
 
 # Start of the game:
-inputangle = input(
+input_angle = input(
     "Please enter the angle (in degrees), at which the pendulum starts its movement.\n> "
 )
-while gamestart:
+while start_game:
 
     try:
-        inputangle = int(inputangle)
-        gamestart = False
-        maingame = True
+        input_angle = int(input_angle)
+        start_game = False
+        main_game = True
     except Exception as e:
-        inputangle = input(
+        input_angle = input(
             "Please enter a positive whole number, without any other symbols.\n> "
         )
 
@@ -149,18 +150,24 @@ while gamestart:
 # Init of pygame and the window:
 pygame.init()
 pygame.display.set_caption("Pendulums")
-windowsize = (1900, 860)
-screen = pygame.display.set_mode(windowsize)
+window_size = (1900, 860)
+screen = pygame.display.set_mode(window_size)
+
+# Object creation:
+pendulum = Pendulum()
+game = Game()
+target = Target()
 
 
 # Main game loop:
-while maingame:
+while main_game:
 
 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
-            maingame = False
+            main_game = False
+            end_game = True
         
         if event.type == pygame.KEYDOWN:
             pendulum.detach
@@ -173,6 +180,10 @@ while maingame:
     pygame.display.flip()
     clock.tick(fps)
 
-# End of the game:
+# The end of the game loop
+while end_game:
+    end_game = False
+
+# Quitting of the game:
 pygame.quit()
 exit(0)
