@@ -100,6 +100,12 @@ class Pendulum:
         self.__angle = math.radians(input_angle) # angle is defined in radians
         self.__displacement_arc = self.__angle * self.__cord_len # displacement on the curved x-achsis (arc)
         self.simulate()
+    
+    def get_detached(self):
+        return self.__detached
+
+    def get_position(self):
+        return self.__position # in pixels
 
     def detach(self):
         alpha = 90 - self.__angle
@@ -109,12 +115,6 @@ class Pendulum:
         self.__detached = True
         game.make_throw(self.__position, self.__velocity)
     
-    def get_detached(self):
-        return self.__detached
-
-    def get_position(self):
-        return self.__position # in pixels
-
     def simulate(self):
 
         self.__acceleration_arc = -gravity_accel[planet] * math.sin(self.__displacement_arc/self.__cord_len)
@@ -144,11 +144,18 @@ class Throw:
         self.__position = position
         self.__velocity = velocity
 
+    def simulate(self):
+        self.__velocity[1] += gravity_accel[planet]/fps
+        self.__position += self.__velocity/fps
+
+
     def collision(self):
         pass
 
     def draw(self):
+        print("LOG: Start throw.draw")
         pygame.draw.circle(screen, WHITE, self.__position, 42)
+        print("LOG: End throw.draw")
 
 
 class Game:
@@ -162,20 +169,24 @@ class Game:
 
         """This method calculates the position
         of all the objects in the game."""
-
+        if pendulum.get_detached():
+            print("LOG: get_detached() returned True")
+            self.throw.simulate()
+            print("LOG: finished self.throw.simulate()")
         pendulum.simulate()
 
     def draw(self):
         target.draw()
         if pendulum.get_detached():
+            print("LOG: get_detached() returned True")
             self.throw.draw()
+            print("LOG: finished self.throw.draw()")
         else:
             pendulum.draw()
         self.draw_pendulum_cord()
 
     def draw_pendulum_cord(self):
         position = pendulum.get_position()
-
         pygame.draw.line(screen, WHITE, position, Pendulum.pendulum_fixpoint, 8)
 
     def make_throw(self, position, velocity):
@@ -240,7 +251,8 @@ while main_game:
         
         if event.type == pygame.KEYDOWN:
             print("LOG: KEYDON")
-            pendulum.detach()
+            if not pendulum.get_detached():
+                pendulum.detach()
             
 
 
