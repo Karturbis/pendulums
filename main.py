@@ -43,7 +43,7 @@ LIGHT_BLUE = (169, 163, 255)
 VIOLET = (230, 69, 200)
 YELLOW = (255, 194, 0)
 
-background_color = VIOLET
+background_color = GREEN
 target_color = YELLOW
 
 time_seconds = 1
@@ -84,6 +84,7 @@ class Pendulum:
 
     def __init__(self):
         self.__detached = False
+        self.__oscillation_period = 2*math.pi*math.sqrt(self.__cord_len/gravity_accel["earth"])
         self.angle = math.radians(input_angle)
         self.simulate()
 
@@ -138,8 +139,10 @@ class Game:
     specific classes and also does some tasks itself."""
 
     def simulate(self):
+
         """This method calculates the position
         of all the objects in the game."""
+
         pendulum.simulate()
 
     def draw(self):
@@ -164,26 +167,31 @@ end_game = False
 clock = pygame.time.Clock()
 fps = 60
 
+# minimum and maximum input angle:
+angle_min = -45
+angle_max = 45
 
 # Start of the game:
 input_angle = input(
-    "Please enter the angle (in degrees), at which the pendulum starts its movement.\n> "
+    f"""\nPlease enter the angle (in degrees),
+at which the pendulum starts its movement.
+The input has to be an integer between {angle_min} and {angle_max}.\n> """
 )
 while start_game:
 
     try:
         input_angle = int(input_angle)
         
-        if input_angle <= 90 and input_angle >=-90:
+        if input_angle <= angle_max and input_angle >= angle_min:
             start_game = False
             main_game = True
         else:
-            error = int("ERROR") # This is to throw an error, when the number is not in ht erequired range. PLEASE CHANGE!!!
+            raise Exception(f"The integer has to be between {angle_min} and {angle_max}.\n>")
+    except ValueError:
+        input_angle = input("The input has to be an integer!\n>")
 
     except Exception as e:
-        input_angle = input(
-            "Please enter a positive whole number between -90 and 90, without any other symbols.\n> "
-        )
+        input_angle = input(e)
 
 
 # Init of pygame and the window:
