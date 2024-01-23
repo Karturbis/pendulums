@@ -46,7 +46,7 @@ YELLOW = (255, 194, 0)
 background_color = VIOLET
 target_color = YELLOW
 
-
+time_seconds = 1
 
 
 class Target:
@@ -57,8 +57,8 @@ class Target:
 
     def __init__(self):
         self.__position = (random.randint(1200, 1700), 840)
-        self.__width = 900
-        self.__height = 900
+        self.__width = 120
+        self.__height = 20
 
     def draw(self):
         pygame.draw.rect(
@@ -80,11 +80,12 @@ class Pendulum:
 
     __cord_len = 100
     __detached = False
+    pendulum_fixpoint = (200, 200)
 
     def __init__(self):
         self.__detached = False
         self.angle = math.radians(input_angle)
-        simulate()
+        self.simulate()
         print(self.__position)
 
     def detach(self):
@@ -96,10 +97,15 @@ class Pendulum:
         return self.__detached
 
     def simulate(self):
-        self.__position = ()
+        self.__position = (
+            self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.angle),
+            self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.angle)
+            )
 
     def draw(self):
         pygame.draw.circle(screen, WHITE, self.__position, 42)
+    
+
     
 
 class Throw:
@@ -130,7 +136,7 @@ class Game:
     def simulate(self):
         """This method calculates the position
         of all the objects in the game."""
-        pass
+        pendulum.simulate()
 
     def draw(self):
         target.draw()
@@ -182,7 +188,6 @@ while main_game:
 
 
     for event in pygame.event.get():
-
         if event.type == pygame.QUIT:
             main_game = False
             end_game = True
@@ -197,6 +202,7 @@ while main_game:
     game.draw()
     pygame.display.flip()
     clock.tick(fps)
+    time_seconds = pygame.time.get_ticks()
 
 # The end of the game loop
 while end_game:
