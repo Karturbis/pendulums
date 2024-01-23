@@ -80,13 +80,12 @@ class Pendulum:
 
     __cord_len = 200
     __detached = False
-    pendulum_fixpoint = (200, 200)
+    pendulum_fixpoint = (400, 200)
 
     def __init__(self):
         self.__detached = False
         self.angle = math.radians(input_angle)
         self.simulate()
-        print(self.__position)
 
     def detach(self):
         self.__detached = True
@@ -96,7 +95,12 @@ class Pendulum:
     def get_detached(self):
         return self.__detached
 
+    def get_position(self):
+        return self.__position
+
     def simulate(self):
+
+        # claculate the angle
         self.__position = (
             self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.angle),
             self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.angle)
@@ -142,8 +146,14 @@ class Game:
         target.draw()
         if pendulum.get_detached():
             throw.draw()
-        pendulum.draw()
-        
+        else:
+            pendulum.draw()
+        self.draw_pendulum_cord()
+
+    def draw_pendulum_cord(self):
+        position = pendulum.get_position()
+
+        pygame.draw.line(screen, WHITE, position, Pendulum.pendulum_fixpoint, 8)
 
 # Gamestate:
 start_game = True
@@ -163,11 +173,16 @@ while start_game:
 
     try:
         input_angle = int(input_angle)
-        start_game = False
-        main_game = True
+        
+        if input_angle <= 90 and input_angle >=-90:
+            start_game = False
+            main_game = True
+        else:
+            error = int("ERROR") # This is to throw an error, when the number is not in ht erequired range. PLEASE CHANGE!!!
+
     except Exception as e:
         input_angle = input(
-            "Please enter a positive whole number, without any other symbols.\n> "
+            "Please enter a positive whole number between -90 and 90, without any other symbols.\n> "
         )
 
 
