@@ -30,6 +30,24 @@ gravity_accel = {
     "nereid": 0.07
     }
 
+# Colors:
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (14, 162, 42)
+LIGHT_GREEN = (106, 255, 80)
+RED = (255, 42, 42)
+LIGHT_RED = (255, 89, 72)
+BLUE = (100, 100, 240)
+LIGHT_BLUE = (169, 163, 255)
+VIOLET = (230, 69, 200)
+YELLOW = (255, 194, 0)
+
+background_color = VIOLET
+target_color = YELLOW
+
+
+
+
 class Target:
 
 
@@ -37,9 +55,9 @@ class Target:
     has to be hitted by the thrown pendulum."""
 
     def __init__(self):
-        self.__position = (random.randint(1200, 1700), 840)
-        self.__width = 100
-        self.__height = 20
+        self.__position = (random.randint(1200, 1700), 840) # REDO TO randint(1200, 1700), 840
+        self.__width = 900
+        self.__height = 900
 
     def draw(self):
         pygame.draw.rect(
@@ -63,7 +81,8 @@ class Pendulum:
 
     def __init__(self):
         self.__detached = False
-        self.__position = (input_angle, input_angle)
+        self.__position = (input_angle ,42)
+        print(self.__position)
 
     def detach(self):
         self.__detached = True
@@ -77,7 +96,7 @@ class Pendulum:
         pass
 
     def draw(self):
-        pygame.draw.circle(screen, (255, 255, 255), self.__position, 42)
+        pygame.draw.circle(screen, WHITE, self.__position, 42)
     
 
 class Throw:
@@ -116,10 +135,6 @@ class Game:
             throw.draw()
         pendulum.draw()
         
-# Colors:
-background_color = (42, 255, 42)
-target_color = (255, 42, 42)
-
 
 # Gamestate:
 start_game = True
