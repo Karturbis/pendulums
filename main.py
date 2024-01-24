@@ -53,12 +53,13 @@ LIGHT_BLUE = (169, 163, 255)
 VIOLET = (230, 69, 200)
 YELLOW = (255, 194, 0)
 
-# Einstellungen:
+# Settings:
 window_size = (1900, 860)
 background_color = GREEN
 target_color = YELLOW
-planet = "io"
-zoom = 175
+weight_radius = 12
+planet = "moon"
+zoom = 200
 
 
 class Target:
@@ -131,7 +132,7 @@ class Pendulum:
         ]
         self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
     def draw(self):
-        pygame.draw.circle(screen, WHITE, self.__position_pixels, 42)
+        pygame.draw.circle(screen, WHITE, self.__position_pixels, weight_radius)
     
 
     
@@ -178,7 +179,7 @@ class Throw:
 
     def draw(self):
         self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
-        pygame.draw.circle(screen, WHITE, self.__position_pixels, 42)
+        pygame.draw.circle(screen, WHITE, self.__position_pixels, weight_radius)
 
 
 class Game:
@@ -213,7 +214,7 @@ class Game:
     def draw_pendulum_cord(self):
         position = pendulum.get_position_pixles()
         fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*zoom, Pendulum.pendulum_fixpoint[1]*zoom]
-        pygame.draw.line(screen, WHITE, position, fixpoint_pixels, 8)
+        pygame.draw.line(screen, WHITE, position, fixpoint_pixels, 2)
 
     def make_throw(self, position_meters, velocity):
         self.throw = Throw(position_meters, velocity)
