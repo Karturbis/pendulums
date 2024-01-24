@@ -58,7 +58,7 @@ window_size = (1900, 860)
 background_color = GREEN
 target_color = YELLOW
 weight_radius = 12
-planet = "moon"
+planet = "earth"
 zoom = 200
 
 
@@ -153,8 +153,8 @@ class Throw:
         self.__velocity[1] += gravity_accel[planet]/fps
         self.__position_meters[0] += self.__velocity[0]/fps
         self.__position_meters[1] += self.__velocity[1]/fps
-        self.collision()
         self.out_of_bound()
+        self.collision()
 
     def collision(self):
         if self.__position_meters[1] >= target.get_position()[1]:
