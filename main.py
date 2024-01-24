@@ -55,8 +55,8 @@ YELLOW = (255, 194, 0)
 
 background_color = GREEN
 target_color = YELLOW
-planet = "earth"
-zoom = 100
+planet = "moon"
+zoom = 161
 
 
 class Target:
@@ -89,14 +89,11 @@ class Pendulum:
     until the weight is detached. Then it only represents the cord."""
 
     __cord_len = 2 # in meter
-    pendulum_fixpoint = (400, 200)
+    pendulum_fixpoint = (4, 1) # in meters
 
     def __init__(self):
         self.__detached = False
         self.__velocity_arc = 0 # the velocity, the pendulum has on the curved x-achsis (arc)
-        self.__oscillation_period = ( 
-            2*math.pi*math.sqrt((self.__cord_len) / gravity_accel[planet]) # time that the pendulum needs to oscillate one time
-        )
         self.__angle = math.radians(input_angle) # angle is defined in radians
         self.__displacement_arc = self.__angle * self.__cord_len # displacement on the curved x-achsis (arc)
         self.simulate()
@@ -104,16 +101,16 @@ class Pendulum:
     def get_detached(self):
         return self.__detached
 
-    def get_position(self):
-        return self.__position # in pixels
+    def get_position_pixles(self):
+        return self.__position_pixels
 
     def detach(self):
-        alpha = 90 - self.__angle
-        self.__velocity = (
+        alpha = self.__angle
+        self.__velocity = [
             math.cos(alpha)*self.__velocity_arc, math.sin(alpha)*self.__velocity_arc
-        )
+        ]
         self.__detached = True
-        game.make_throw(self.__position, self.__velocity)
+        game.make_throw(self.__position_meters, self.__velocity)
     
     def simulate(self):
 
@@ -121,13 +118,13 @@ class Pendulum:
         self.__velocity_arc += self.__acceleration_arc/fps # see comment below:
         self.__displacement_arc += self.__velocity_arc/fps # dividing by fps to get seconds in the calculation. E.G if this is done 60 times per second, the displacement is raised by the velocity (m/s²) every second.
         self.__angle = self.__displacement_arc/self.__cord_len
-        self.__position = ( # in pixels:
-            self.pendulum_fixpoint[0] + self.__cord_len*zoom*math.sin(self.__angle),
-            self.pendulum_fixpoint[1] + self.__cord_len*zoom*math.cos(self.__angle)
-            )
-
+        self.__position_meters = [
+            self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.__angle),
+            self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.__angle)
+        ]
+        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
     def draw(self):
-        pygame.draw.circle(screen, WHITE, self.__position, 42)
+        pygame.draw.circle(screen, WHITE, self.__position_pixels, 42)
     
 
     
@@ -140,13 +137,19 @@ class Throw:
     with the start position and velocity, which the pendulum
     had, when it was detached."""
 
-    def __init__(self, position, velocity):
-        self.__position = position
+    def __init__(self, position_meters, velocity):
+        print("LOG: init Throw: start")
+        self.__position_meters = position_meters
+        print(f"LOG: init Throw: position = {self.__position_meters}")
         self.__velocity = velocity
+        print(f"LOG: init Throw: velocity = {self.__velocity}")
 
     def simulate(self):
         self.__velocity[1] += gravity_accel[planet]/fps
-        self.__position += self.__velocity/fps
+        self.__position_meters[0] += self.__velocity[0]/fps
+        self.__position_meters[1] += self.__velocity[1]/fps
+
+        print(f"LOG: Throw.__position: {self.__position_meters}")
 
 
     def collision(self):
@@ -154,7 +157,8 @@ class Throw:
 
     def draw(self):
         print("LOG: Start throw.draw")
-        pygame.draw.circle(screen, WHITE, self.__position, 42)
+        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
+        pygame.draw.circle(screen, WHITE, self.__position_pixels, 42)
         print("LOG: End throw.draw")
 
 
@@ -186,11 +190,12 @@ class Game:
         self.draw_pendulum_cord()
 
     def draw_pendulum_cord(self):
-        position = pendulum.get_position()
-        pygame.draw.line(screen, WHITE, position, Pendulum.pendulum_fixpoint, 8)
+        position = pendulum.get_position_pixles()
+        fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*zoom, Pendulum.pendulum_fixpoint[1]*zoom]
+        pygame.draw.line(screen, WHITE, position, fixpoint_pixels, 8)
 
-    def make_throw(self, position, velocity):
-        self.throw = Throw(position, velocity)
+    def make_throw(self, position_meters, velocity):
+        self.throw = Throw(position_meters, velocity)
 
 # Gamestate:
 start_game = True
@@ -202,8 +207,8 @@ clock = pygame.time.Clock()
 fps = 60
 
 # minimum and maximum input angle:
-angle_min = -45
-angle_max = 45
+angle_min = -90
+angle_max = 90
 
 # Start of the game:
 input_angle = input(
