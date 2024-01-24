@@ -53,10 +53,12 @@ LIGHT_BLUE = (169, 163, 255)
 VIOLET = (230, 69, 200)
 YELLOW = (255, 194, 0)
 
+# Einstellungen:
+window_size = (1900, 860)
 background_color = GREEN
 target_color = YELLOW
-planet = "moon"
-zoom = 161
+planet = "io"
+zoom = 175
 
 
 class Target:
@@ -66,21 +68,27 @@ class Target:
     has to be hitted by the thrown pendulum."""
 
     def __init__(self):
-        self.__position = (random.randint(1200, 1700), 840)
         self.__width = 120
         self.__height = 20
+        self.__position_pixels = [random.randint(0, window_size[0]-self.__width), window_size[1]-self.__height]
+    
+    def get_position(self):
+        position_meters = [
+            self.__position_pixels[0]/zoom,
+            self.__position_pixels[1]/zoom
+        ]
+        return position_meters
+
+    def get_width(self):
+        return self.__width
 
     def draw(self):
         pygame.draw.rect(
             screen, target_color,
-            (self.__position,
+            (self.__position_pixels,
             (self.__width, self.__height)
             )
         )
-
-    def collision(self):
-        pass
-
 
 class Pendulum:
 
@@ -89,7 +97,7 @@ class Pendulum:
     until the weight is detached. Then it only represents the cord."""
 
     __cord_len = 2 # in meter
-    pendulum_fixpoint = (4, 1) # in meters
+    pendulum_fixpoint = (window_size[0]/zoom/2, 1) # in meters
 
     def __init__(self):
         self.__detached = False
@@ -105,9 +113,8 @@ class Pendulum:
         return self.__position_pixels
 
     def detach(self):
-        alpha = self.__angle
         self.__velocity = [
-            math.cos(alpha)*self.__velocity_arc, math.sin(alpha)*self.__velocity_arc
+            math.cos(self.__angle)*self.__velocity_arc, -math.sin(self.__angle)*self.__velocity_arc
         ]
         self.__detached = True
         game.make_throw(self.__position_meters, self.__velocity)
@@ -138,28 +145,40 @@ class Throw:
     had, when it was detached."""
 
     def __init__(self, position_meters, velocity):
-        print("LOG: init Throw: start")
         self.__position_meters = position_meters
-        print(f"LOG: init Throw: position = {self.__position_meters}")
         self.__velocity = velocity
-        print(f"LOG: init Throw: velocity = {self.__velocity}")
 
     def simulate(self):
         self.__velocity[1] += gravity_accel[planet]/fps
         self.__position_meters[0] += self.__velocity[0]/fps
         self.__position_meters[1] += self.__velocity[1]/fps
-
-        print(f"LOG: Throw.__position: {self.__position_meters}")
-
+        self.collision()
+        self.out_of_bound()
 
     def collision(self):
-        pass
+        if self.__position_meters[1] >= target.get_position()[1]:
+            print("LOG: Collision on y-achsis")
+            if self.__position_meters[0] > target.get_position()[0] and self.__position_meters[0] < target.get_position()[0] + target.get_width()/zoom:
+                print("LOG: Collision on x-achsis")
+                print("LOG: Exit game(Won)")
+                game.main_game = False
+                game.end_game = True
+    
+    def out_of_bound(self):
+        if self.__position_meters[0] < 0 or self.__position_meters[0] > window_size[0]*zoom:
+            print("LOG: Out of bound on x-achsis")
+            print("LOG: Exit game(Lost)")
+            game.main_game = False
+            game.end_game = True
+        if self.__position_meters[1] < 0 or self.__position_meters[1] > window_size[1]/zoom:
+            print("LOG: Out of bound on y-achsis")
+            print("LOG: Exit game(Lost)")
+            game.main_game = False
+            game.end_game = True
 
     def draw(self):
-        print("LOG: Start throw.draw")
         self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
         pygame.draw.circle(screen, WHITE, self.__position_pixels, 42)
-        print("LOG: End throw.draw")
 
 
 class Game:
@@ -168,23 +187,25 @@ class Game:
     """The game class redirects some tasks to the more
     specific classes and also does some tasks itself."""
 
+    def __init__(self):
+        # Gamestate:
+        self.start_game = True
+        self.main_game = False
+        self.end_game = False
+
 
     def simulate(self):
 
         """This method calculates the position
         of all the objects in the game."""
         if pendulum.get_detached():
-            print("LOG: get_detached() returned True")
             self.throw.simulate()
-            print("LOG: finished self.throw.simulate()")
         pendulum.simulate()
 
     def draw(self):
         target.draw()
         if pendulum.get_detached():
-            print("LOG: get_detached() returned True")
             self.throw.draw()
-            print("LOG: finished self.throw.draw()")
         else:
             pendulum.draw()
         self.draw_pendulum_cord()
@@ -197,14 +218,9 @@ class Game:
     def make_throw(self, position_meters, velocity):
         self.throw = Throw(position_meters, velocity)
 
-# Gamestate:
-start_game = True
-main_game = False
-end_game = False
 
-# Pygame time management:
-clock = pygame.time.Clock()
-fps = 60
+game = Game()
+
 
 # minimum and maximum input angle:
 angle_min = -90
@@ -216,14 +232,14 @@ input_angle = input(
 at which the pendulum starts its movement.
 The input has to be an integer between {angle_min} and {angle_max}.\n> """
 )
-while start_game:
+while game.start_game:
 
     try:
         input_angle = int(input_angle)
         
         if input_angle <= angle_max and input_angle >= angle_min:
-            start_game = False
-            main_game = True
+            game.start_game = False
+            game.main_game = True
         else:
             raise Exception(f"The integer has to be between {angle_min} and {angle_max}.\n>")
     except ValueError:
@@ -233,29 +249,29 @@ while start_game:
         input_angle = input(e)
 
 
+# Pygame time management:
+clock = pygame.time.Clock()
+fps = 60
+
 # Init of pygame and the window:
 pygame.init()
 pygame.display.set_caption("Pendulums")
-window_size = (1900, 860)
 screen = pygame.display.set_mode(window_size)
 
-# Object creation:
-pendulum = Pendulum()
-game = Game()
 target = Target()
-
+pendulum = Pendulum()
 
 # Main game loop:
-while main_game:
+while game.main_game:
 
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            main_game = False
-            end_game = True
+            game.main_game = False
+            game.end_game = True
         
         if event.type == pygame.KEYDOWN:
-            print("LOG: KEYDON")
+            print("LOG: KEYDOWN")
             if not pendulum.get_detached():
                 pendulum.detach()
             
@@ -269,8 +285,9 @@ while main_game:
     clock.tick(fps)
 
 # The end of the game loop
-while end_game:
-    end_game = False
+while game.end_game:
+    print(f"LOG: Time needed: {pygame.time.get_ticks()/1000}s")
+    game.end_game = False
 
 # Quitting of the game:
 pygame.quit()
