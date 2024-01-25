@@ -53,10 +53,6 @@ LIGHT_BLUE = (169, 163, 255)
 VIOLET = (230, 69, 200)
 YELLOW = (255, 194, 0)
 
-# minimum and maximum input angle:
-angle_min = -90
-angle_max = 90
-
 # Settings:
 window_size = (1900, 860)
 background_color = GREEN
