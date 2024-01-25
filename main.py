@@ -58,7 +58,7 @@ window_size = (1900, 860)
 background_color = GREEN
 target_color = YELLOW
 weight_radius = 12
-planet = "earth"
+planet = "moon"
 zoom = 200
 
 
@@ -164,6 +164,7 @@ class Throw:
                 print("LOG: Exit game(Won)")
                 game.main_game = False
                 game.end_game = True
+                game.endGame(won=True)
     
     def out_of_bound(self):
         if self.__position_meters[0] < 0 or self.__position_meters[0] > window_size[0]/zoom:
@@ -171,14 +172,13 @@ class Throw:
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.end_game = True
-            return True
+            game.endGame(won=False)
         if self.__position_meters[1] < 0 or self.__position_meters[1] > window_size[1]/zoom:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.end_game = True
-            return True
-        return False
+            game.endGame(won=False)
 
     def draw(self):
         self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
@@ -221,6 +221,22 @@ class Game:
 
     def make_throw(self, position_meters, velocity):
         self.throw = Throw(position_meters, velocity)
+    
+    def endGame(self, won):
+        self.__time_needed = pygame.time.get_ticks()/1000
+        self.__score = 0
+
+        if won:
+            self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*100)
+            print(f"LOG: Time needed: {self.__time_needed}s.")
+            print(f"LOG: Your score is: {self.__score} points!")
+        else:
+            print("LOG: You Lost.")
+            print(f"LOG: Time elapsed: {self.__time_needed}s.")
+
+        # Quitting of the game:
+        pygame.quit()
+        exit(0)
 
 
 game = Game()
@@ -288,11 +304,3 @@ while game.main_game:
     pygame.display.flip()
     clock.tick(fps)
 
-# The end of the game loop
-while game.end_game:
-    print(f"LOG: Time needed: {pygame.time.get_ticks()/1000}s")
-    game.end_game = False
-
-# Quitting of the game:
-pygame.quit()
-exit(0)
