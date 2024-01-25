@@ -109,7 +109,7 @@ class Pendulum:
     def __init__(self):
         self.__detached = False
         self.__velocity_arc = 0 # the velocity, the pendulum has on the curved x-achsis (arc)
-        self.__angle = math.radians(input_angle) # angle is defined in radians
+        self.__angle = math.radians(game.input_angle) # angle is defined in radians
         self.__displacement_arc = self.__angle * self.__cord_len # displacement on the curved x-achsis (arc)
         self.simulate()
     
@@ -167,7 +167,6 @@ class Throw:
                 print("LOG: Collision on x-achsis")
                 print("LOG: Exit game(Won)")
                 game.main_game = False
-                game.end_game = True
                 game.endGame(won=True)
     
     def out_of_bound(self):
@@ -175,13 +174,11 @@ class Throw:
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
-            game.end_game = True
             game.endGame(won=False)
         if self.__position_meters[1] < 0 or self.__position_meters[1] > window_size[1]/zoom:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
-            game.end_game = True
             game.endGame(won=False)
 
     def draw(self):
@@ -198,8 +195,7 @@ class Game:
     def __init__(self):
         # Gamestate:
         self.start_game = True
-        self.main_game = False
-        self.end_game = False
+        self.main_game = True
 
 
     def simulate(self):
@@ -232,21 +228,44 @@ class Game:
         self.clock = pygame.time.Clock()
         
 
-        # Init of pygame and the window:
-        pygame.init()
-        pygame.display.set_caption("Pendulums")
-        self.screen = pygame.display.set_mode(window_size)
 
-        self.target = Target()
-        self.pendulum = Pendulum()
         
         while self.main_game:
 
+            # check for gamestates:
+            if self.start_game:
+                # Start of the game:
+                self.input_angle = input(
+                    f"""\nPlease enter the angle (in degrees),
+                at which the pendulum starts its movement.
+                The input has to be an integer between {angle_min} and {angle_max}.\n> """
+                )
+                while self.start_game:
+
+                    try:
+                        self.input_angle = int(self.input_angle)
+                        
+                        if self.input_angle <= angle_max and self.input_angle >= angle_min:
+                            self.start_game = False
+                            # Init of pygame and the window:
+                            pygame.init()
+                            pygame.display.set_caption("Pendulums")
+                            self.screen = pygame.display.set_mode(window_size)
+
+                            self.target = Target()
+                            self.pendulum = Pendulum()
+                        else:
+                            raise Exception(f"The integer has to be between {angle_min} and {angle_max}.\n>")
+                    except ValueError:
+                        self.input_angle = input("The input has to be an integer!\n>")
+
+                    except Exception as e:
+                        self.input_angle = input(e)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.main_game = False
-                    self.end_game = True
+                    self.endGame(won=False)
                 
                 if event.type == pygame.KEYDOWN:
                     print("LOG: KEYDOWN")
@@ -281,29 +300,7 @@ class Game:
 
 game = Game()
 
-
-# Start of the game:
-input_angle = input(
-    f"""\nPlease enter the angle (in degrees),
-at which the pendulum starts its movement.
-The input has to be an integer between {angle_min} and {angle_max}.\n> """
-)
-while game.start_game:
-
-    try:
-        input_angle = int(input_angle)
-        
-        if input_angle <= angle_max and input_angle >= angle_min:
-            game.start_game = False
-            game.main_game = True
-            game.mainGame()
-        else:
-            raise Exception(f"The integer has to be between {angle_min} and {angle_max}.\n>")
-    except ValueError:
-        input_angle = input("The input has to be an integer!\n>")
-
-    except Exception as e:
-        input_angle = input(e)
+game.mainGame()
 
 
 
