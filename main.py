@@ -235,32 +235,16 @@ class Game:
             # check for gamestates:
             if self.start_game:
                 # Start of the game:
-                self.input_angle = input(
-                    f"""\nPlease enter the angle (in degrees),
-                at which the pendulum starts its movement.
-                The input has to be an integer between {angle_min} and {angle_max}.\n> """
-                )
+                self.input_angle = 90
                 while self.start_game:
+                    # Init of pygame and the window:
+                    pygame.init()
+                    pygame.display.set_caption("Pendulums")
+                    self.screen = pygame.display.set_mode(window_size)
+                    self.target = Target()
+                    self.pendulum = Pendulum()
+                    self.start_game = False
 
-                    try:
-                        self.input_angle = int(self.input_angle)
-                        
-                        if self.input_angle <= angle_max and self.input_angle >= angle_min:
-                            self.start_game = False
-                            # Init of pygame and the window:
-                            pygame.init()
-                            pygame.display.set_caption("Pendulums")
-                            self.screen = pygame.display.set_mode(window_size)
-
-                            self.target = Target()
-                            self.pendulum = Pendulum()
-                        else:
-                            raise Exception(f"The integer has to be between {angle_min} and {angle_max}.\n>")
-                    except ValueError:
-                        self.input_angle = input("The input has to be an integer!\n>")
-
-                    except Exception as e:
-                        self.input_angle = input(e)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
