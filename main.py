@@ -3,7 +3,7 @@ In this simulation:
 In real life:        In this simulation:
 
 1 Meter         =   1 Pixel / zoom => 1Pixel = 1Meter*zoom
-1 Sekunde       =   1 Sekunde (60 frames)
+1 Second       =   1 Second (60 frames)
 
 In the physics calculations, SI-units are used.
 """
