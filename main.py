@@ -153,8 +153,8 @@ class Throw:
         self.__velocity[1] += gravity_accel[planet]/fps
         self.__position_meters[0] += self.__velocity[0]/fps
         self.__position_meters[1] += self.__velocity[1]/fps
-        self.out_of_bound()
-        self.collision()
+        if not self.out_of_bound():
+            self.collision()
 
     def collision(self):
         if self.__position_meters[1] >= target.get_position()[1]:
@@ -166,16 +166,19 @@ class Throw:
                 game.end_game = True
     
     def out_of_bound(self):
-        if self.__position_meters[0] < 0 or self.__position_meters[0] > window_size[0]*zoom:
+        if self.__position_meters[0] < 0 or self.__position_meters[0] > window_size[0]/zoom:
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.end_game = True
+            return True
         if self.__position_meters[1] < 0 or self.__position_meters[1] > window_size[1]/zoom:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.end_game = True
+            return True
+        return False
 
     def draw(self):
         self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
