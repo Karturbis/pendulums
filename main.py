@@ -58,7 +58,7 @@ YELLOW = (255, 194, 0)
 window_size = (1900, 860)
 background_color = BLUE
 target_color = YELLOW
-weight_radius = 1
+weight_radius = 14
 planet = "jupiter"
 zoom = 200
 fps = 60
@@ -172,12 +172,12 @@ class Throw:
                 game.endGame(won=True)
     
     def out_of_bound(self):
-        if self.__position_meters[0]-weight_radius/zoom < 0 or self.__position_meters[0]+weight_radius/zoom > window_size[0]/zoom:
+        if self.__position_meters[0]*zoom < 0 or self.__position_meters[0]*zoom > window_size[0]:
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
-        if self.__position_meters[1]-weight_radius/zoom < 0 or self.__position_meters[1]+weight_radius/zoom > window_size[1]/zoom:
+        if self.__position_meters[1]*zoom < 0 or self.__position_meters[1]*zoom > window_size[1]:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
@@ -298,6 +298,8 @@ class EndGame:
     def calcTime(self):
         self.__time_needed = round(pygame.time.get_ticks()/1000 - game.start_ticks/1000, 3)
 
+    def
+
     def draw(self, won):
         done = False
         while not done:
@@ -364,7 +366,10 @@ class Menu:
         pass
 
     def menu_loop(self):
-        pass
+        
+        done = False
+        while not done:
+
         
 
 class Button:
