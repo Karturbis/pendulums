@@ -10,6 +10,7 @@ In the physics calculations, SI-units are used.
 
 import math
 import random
+import pickle
 import pygame
 from pygame.locals import *
 
@@ -48,23 +49,24 @@ GREEN = (14, 162, 42)
 LIGHT_GREEN = (106, 255, 80)
 RED = (255, 42, 42)
 LIGHT_RED = (255, 89, 72)
-BLUE = (100, 100, 240)
+BLUE = (20, 40, 60)
 LIGHT_BLUE = (169, 163, 255)
 VIOLET = (230, 69, 200)
 YELLOW = (255, 194, 0)
 
 # Settings:
 window_size = (1900, 860)
-background_color = GREEN
+background_color = BLUE
 target_color = YELLOW
-weight_radius = 12
-planet = "moon"
+weight_radius = 1
+planet = "jupiter"
 zoom = 200
 fps = 60
 
 pygame.init()
 pygame.display.set_caption("Pendulums")
-
+font = pygame.font.Font("freesansbold.ttf", 90)
+reload_img = pygame.image.load("images/reload_btn.png")
 
 class Target:
 
@@ -136,6 +138,7 @@ class Pendulum:
             self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.__angle)
         ]
         self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
+
     def draw(self):
         pygame.draw.circle(game.screen, WHITE, self.__position_pixels, weight_radius)
 
@@ -160,21 +163,21 @@ class Throw:
             self.collision()
 
     def collision(self):
-        if self.__position_meters[1] >= game.target.get_position()[1]:
+        if self.__position_meters[1]+weight_radius/zoom >= game.target.get_position()[1]:
             print("LOG: Collision on y-achsis")
-            if self.__position_meters[0] > game.target.get_position()[0] and self.__position_meters[0] < game.target.get_position()[0] + game.target.get_width()/zoom:
+            if self.__position_meters[0]+weight_radius/zoom > game.target.get_position()[0] and self.__position_meters[0]-weight_radius/zoom < game.target.get_position()[0] + game.target.get_width()/zoom:
                 print("LOG: Collision on x-achsis")
                 print("LOG: Exit game(Won)")
                 game.main_game = False
                 game.endGame(won=True)
     
     def out_of_bound(self):
-        if self.__position_meters[0] < 0 or self.__position_meters[0] > window_size[0]/zoom:
+        if self.__position_meters[0]-weight_radius/zoom < 0 or self.__position_meters[0]+weight_radius/zoom > window_size[0]/zoom:
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
-        if self.__position_meters[1] < 0 or self.__position_meters[1] > window_size[1]/zoom:
+        if self.__position_meters[1]-weight_radius/zoom < 0 or self.__position_meters[1]+weight_radius/zoom > window_size[1]/zoom:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
@@ -185,7 +188,7 @@ class Throw:
         pygame.draw.circle(game.screen, WHITE, self.__position_pixels, weight_radius)
 
 
-class Game:
+class MainGame:
 
 
     """The game class redirects some tasks to the more
@@ -196,6 +199,8 @@ class Game:
         self.start_game = True
         self.main_game = True
         self.done = False
+        self.screen = pygame.display.set_mode(window_size)
+        self.clock = pygame.time.Clock()
 
 
     def simulate(self):
@@ -222,14 +227,12 @@ class Game:
     def make_throw(self, position_meters, velocity):
         self.throw = Throw(position_meters, velocity)
     
+    def reset_highscore(self):
+        Files.set_highscores([0, 0, 0, 0, 0])
+        print("LOG: highscore has beeen reset to zero.")
+
 
     def mainGame(self):
-        # Pygame time management:
-        self.clock = 0
-        self.clock = pygame.time.Clock()
-        
-
-
         
         while self.main_game:
 
@@ -239,8 +242,7 @@ class Game:
                 self.input_angle = 90
                 self.start_ticks = pygame.time.get_ticks()
                 while self.start_game:
-                    # Init of pygame and the window:
-                    self.screen = pygame.display.set_mode(window_size)
+                    
                     self.target = Target()
                     self.pendulum = Pendulum()
                     self.start_game = False
@@ -249,8 +251,8 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.main_game = False
-                    self.endGame(won=False)
-                    self.done = True
+                    pygame.QUIT
+                    exit(0)
                 
                 if event.type == pygame.KEYDOWN:
                     print("LOG: KEYDOWN")
@@ -262,30 +264,146 @@ class Game:
             self.draw()
             pygame.display.flip()
             self.clock.tick(fps)
-
+        
     def endGame(self, won):
-        self.__time_needed = round(pygame.time.get_ticks()/1000 - self.start_ticks/1000, 3)
+        endgame = EndGame()
+        endgame.checkWin(won)
+        endgame.draw(won)
+
+
+class EndGame:
+
+
+    def __init__(self):
+        self.reload_button = TextButton(window_size[0]/2-262, window_size[1]/4, "Play again!")
+        self.menu_button = TextButton(window_size[0]/2-262, window_size[1]/2, "Menu")
+        self.exit_button = TextButton(window_size[0]/2-262, window_size[1]/4*3, "Exit")
+
+    def calcScore(self):
+        self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*1000/weight_radius)
+        if gravity_accel[planet] < 4.2:
+            self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*1000/weight_radius/gravity_accel[planet]*4.2)
+    
+    def calcHighscores(self):
+        for i in range(len(self.__highscores)):
+                if self.__score < self.__highscores[i]:
+                    continue
+                else:
+                    print(f"LOG: The old highscore is: {self.__highscores[i]}")
+                    highscore_loose = self.__highscores[i]
+                    self.__highscores[i] = self.__score
+                    self.__score = highscore_loose
+        Files.set_highscores(self.__highscores)
+
+    def calcTime(self):
+        self.__time_needed = round(pygame.time.get_ticks()/1000 - game.start_ticks/1000, 3)
+
+    def draw(self, won):
+        done = False
+        while not done:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.QUIT
+                    exit(0)
+            if won:
+                game.screen.fill(GREEN)
+            else:
+                game.screen.fill(LIGHT_RED)
+            self.reload_button.draw()
+            self.menu_button.draw()
+            self.exit_button.draw()
+            if self.reload_button.checkClicked():
+                done = True
+            if self.menu_button.checkClicked():
+                pass
+            if self.exit_button.checkClicked():
+                pygame.QUIT
+                exit(0)
+            pygame.display.flip()
+
+    def checkWin(self, won):
+        
         self.__score = 0
+        self.__highscores = Files.get_highscores()
+        self.calcTime()
 
         if won:
-            self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*100)
+            self.calcScore()
             print(f"LOG: Time needed: {self.__time_needed}s.")
+            self.calcHighscores()
             print(f"LOG: Your score is: {self.__score} points!")
+            
+
         else:
-            print("LOG: You Lost.")
+            print("LOG: Game lost.")
             print(f"LOG: Time elapsed: {self.__time_needed}s.")
 
-        # Quitting of the game:
-        #pygame.quit()
-        #exit(0)
+
+class Files:
+
+    def get_highscores():
+        with open("data/highscores.pickle", "rb") as reader:
+            highscores = pickle.load(reader)
+        return highscores
+    
+    def set_highscores(highscores):
+        with open("data/highscores.pickle", "wb") as writer:
+            print(f"LOG: highscores: {highscores}")
+            pickle.dump(highscores, writer)
 
 
-game = Game()
+class Menu:
+    
+    def __init__(self):
+        pass
+
+    def draw(self):
+        pass
+
+    def handle_buttons(self):
+        pass
+
+    def menu_loop(self):
+        pass
+        
+
+class Button:
+    
+    def __init__(self, x_position, y_position, image):
+        self.__image = image
+        self.__rect = self.__image.get_rect()
+        self.__rect.topleft = (x_position, y_position)
+        
+    def draw(self):
+        game.screen.blit(self.__image, (self.__rect.x, self.__rect.y))
+
+
+class TextButton:
+    def __init__(self, x_position, y_position, text):
+        self.__x_position = x_position
+        self.__y_position = y_position
+        self.__text = text
+
+    def draw(self):
+        button_text = font.render(self.__text, True, WHITE)
+        self.button_rect = pygame.rect.Rect((self.__x_position, self.__y_position),(523, 100))
+        pygame.draw.rect(game.screen, BLUE, self.button_rect, 0, 5)
+        game.screen.blit(button_text, (self.__x_position + 4, self.__y_position + 4))
+    
+    def checkClicked(self):
+        mouse_position = pygame.mouse.get_pos()
+        left_click = pygame.mouse.get_pressed()[0]
+        if left_click and self.button_rect.collidepoint(mouse_position):
+            return True
+        else:
+            return False
+
+game = MainGame()
 
 while not game.done:
+    print("\n--------------------\nLOG: Start the game!\n--------------------")
     game.start_game = True
     game.main_game = True
-
     game.mainGame()
 
 
