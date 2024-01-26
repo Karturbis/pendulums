@@ -62,6 +62,9 @@ planet = "moon"
 zoom = 200
 fps = 60
 
+pygame.init()
+pygame.display.set_caption("Pendulums")
+
 
 class Target:
 
@@ -99,7 +102,7 @@ class Pendulum:
     """Class that represents the pendulum cord and the pendulum weight,
     until the weight is detached. Then it only represents the cord."""
 
-    __cord_len = 2 # in meter
+    __cord_len = 2 # in meters
     pendulum_fixpoint = (window_size[0]/zoom/2, 1) # in meters
 
     def __init__(self):
@@ -192,6 +195,7 @@ class Game:
         # Gamestate:
         self.start_game = True
         self.main_game = True
+        self.done = False
 
 
     def simulate(self):
@@ -221,6 +225,7 @@ class Game:
 
     def mainGame(self):
         # Pygame time management:
+        self.clock = 0
         self.clock = pygame.time.Clock()
         
 
@@ -232,10 +237,9 @@ class Game:
             if self.start_game:
                 # Start of the game:
                 self.input_angle = 90
+                self.start_ticks = pygame.time.get_ticks()
                 while self.start_game:
                     # Init of pygame and the window:
-                    pygame.init()
-                    pygame.display.set_caption("Pendulums")
                     self.screen = pygame.display.set_mode(window_size)
                     self.target = Target()
                     self.pendulum = Pendulum()
@@ -246,23 +250,21 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.main_game = False
                     self.endGame(won=False)
+                    self.done = True
                 
                 if event.type == pygame.KEYDOWN:
                     print("LOG: KEYDOWN")
                     if not self.pendulum.get_detached():
                         self.pendulum.detach()
                     
-
-
             self.screen.fill(background_color)
-
             self.simulate()
             self.draw()
             pygame.display.flip()
             self.clock.tick(fps)
 
     def endGame(self, won):
-        self.__time_needed = pygame.time.get_ticks()/1000
+        self.__time_needed = round(pygame.time.get_ticks()/1000 - self.start_ticks/1000, 3)
         self.__score = 0
 
         if won:
@@ -274,13 +276,17 @@ class Game:
             print(f"LOG: Time elapsed: {self.__time_needed}s.")
 
         # Quitting of the game:
-        pygame.quit()
-        exit(0)
+        #pygame.quit()
+        #exit(0)
 
 
 game = Game()
 
-game.mainGame()
+while not game.done:
+    game.start_game = True
+    game.main_game = True
+
+    game.mainGame()
 
 
 
