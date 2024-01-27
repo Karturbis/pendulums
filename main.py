@@ -234,7 +234,7 @@ class MainGame:
 
 
     def mainGame(self):
-        
+        pygame.mouse.set_visible(0)
         while self.main_game:
 
             # check for gamestates:
@@ -278,6 +278,7 @@ class MainGame:
 class EndGame:
 
     def __init__(self):
+        pygame.mouse.set_visible(1)
         self.menu_button = TextButton(window_size[0]/8, window_size[1]/9*8, "Menu", 255)
         self.reload_button = TextButton(window_size[0]/2, window_size[1]/9*8, "Play again!", 500)
         self.exit_button = TextButton(window_size[0]/9*8, window_size[1]/9*8, "Exit", 195)
@@ -392,6 +393,7 @@ class Files:
 class Menu:
     
     def __init__(self):
+        pygame.mouse.set_visible(1)
         self.__play_button = TextButton(window_size[0]/4, window_size[1]/4, "Play", 205)
         self.__exit_button = TextButton(window_size[0]/4, window_size[1]/2, "Exit", 195)
         self.__planets_button = TextButton(window_size[0]/4, window_size[1]/4*3, "Choose planet", 650)
@@ -415,6 +417,10 @@ class Menu:
                 if event.type == pygame.QUIT:
                     pygame.QUIT
                     exit(0)
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                       pygame.QUIT
+                       exit(0)
             game.screen.fill(VIOLET)
             self.draw()
 
