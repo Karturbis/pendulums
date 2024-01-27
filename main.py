@@ -45,27 +45,28 @@ gravity_accel = {
 # Colors:
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GREEN = (14, 162, 42)
+GREEN = (20, 80, 20)#(14, 162, 42)
 LIGHT_GREEN = (106, 255, 80)
-RED = (255, 42, 42)
+RED = (80, 20, 20)#(255, 42, 42)
 LIGHT_RED = (255, 89, 72)
 BLUE = (20, 40, 60)
 LIGHT_BLUE = (169, 163, 255)
-VIOLET = (230, 69, 200)
+VIOLET = (100, 0, 70)
 YELLOW = (255, 194, 0)
 
 # Settings:
-window_size = (1900, 860)
+window_size = (1920, 860)
 background_color = BLUE
 target_color = YELLOW
 weight_radius = 14
-planet = "jupiter"
-zoom = 200
+planet = "earth"
+zoom = 195 # min 120, max 270
 fps = 60
 
 pygame.init()
 pygame.display.set_caption("Pendulums")
 font = pygame.font.Font("freesansbold.ttf", 90)
+font_big = pygame.font.Font("freesansbold.ttf", 200)
 reload_img = pygame.image.load("images/reload_btn.png")
 
 class Target:
@@ -228,8 +229,8 @@ class MainGame:
         self.throw = Throw(position_meters, velocity)
     
     def reset_highscore(self):
-        Files.set_highscores([0, 0, 0, 0, 0])
-        print("LOG: highscore has beeen reset to zero.")
+            Files.set_highscores([0, 0, 0, 0, 0])
+            print("LOG: highscore has beeen reset to zero.")
 
 
     def mainGame(self):
@@ -256,8 +257,11 @@ class MainGame:
                 
                 if event.type == pygame.KEYDOWN:
                     print("LOG: KEYDOWN")
-                    if not self.pendulum.get_detached():
-                        self.pendulum.detach()
+                    if event.key == K_ESCAPE:
+                        menu = Menu()
+                        menu.menuLoop()
+                    elif not self.pendulum.get_detached():
+                            self.pendulum.detach()
                     
             self.screen.fill(background_color)
             self.simulate()
@@ -266,62 +270,87 @@ class MainGame:
             self.clock.tick(fps)
         
     def endGame(self, won):
-        endgame = EndGame()
-        endgame.checkWin(won)
-        endgame.draw(won)
+        self.endgame = EndGame()
+        self.endgame.checkWin(won)
+        self.endgame.endGameLoop(won)
 
 
 class EndGame:
 
-
     def __init__(self):
-        self.reload_button = TextButton(window_size[0]/2-262, window_size[1]/4, "Play again!")
-        self.menu_button = TextButton(window_size[0]/2-262, window_size[1]/2, "Menu")
-        self.exit_button = TextButton(window_size[0]/2-262, window_size[1]/4*3, "Exit")
+        self.menu_button = TextButton(window_size[0]/8, window_size[1]/9*8, "Menu", 255)
+        self.reload_button = TextButton(window_size[0]/2, window_size[1]/9*8, "Play again!", 500)
+        self.exit_button = TextButton(window_size[0]/9*8, window_size[1]/9*8, "Exit", 195)
 
     def calcScore(self):
-        self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*1000/weight_radius)
+        self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*100000/zoom/weight_radius)
         if gravity_accel[planet] < 4.2:
-            self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*1000/weight_radius/gravity_accel[planet]*4.2)
+            self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*100000/zoom/weight_radius/gravity_accel[planet]*4.2)
     
     def calcHighscores(self):
+        score_loose = self.__score
         for i in range(len(self.__highscores)):
-                if self.__score < self.__highscores[i]:
+                if score_loose < self.__highscores[i]:
                     continue
                 else:
                     print(f"LOG: The old highscore is: {self.__highscores[i]}")
                     highscore_loose = self.__highscores[i]
-                    self.__highscores[i] = self.__score
-                    self.__score = highscore_loose
+                    self.__highscores[i] = score_loose
+                    score_loose = highscore_loose
         Files.set_highscores(self.__highscores)
 
     def calcTime(self):
         self.__time_needed = round(pygame.time.get_ticks()/1000 - game.start_ticks/1000, 3)
 
-    def
-
-    def draw(self, won):
-        done = False
-        while not done:
+    def endGameLoop(self, won):
+        self.done = False
+        while not self.done:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.QUIT
                     exit(0)
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        menu = Menu()
+                        menu.menuLoop()
+                    else:
+                        self.done = True
             if won:
                 game.screen.fill(GREEN)
             else:
-                game.screen.fill(LIGHT_RED)
-            self.reload_button.draw()
-            self.menu_button.draw()
-            self.exit_button.draw()
+                game.screen.fill(RED)
+            self.draw()
             if self.reload_button.checkClicked():
-                done = True
+                self.done = True
             if self.menu_button.checkClicked():
-                pass
+                menu = Menu()
+                menu.menuLoop()
             if self.exit_button.checkClicked():
                 pygame.QUIT
                 exit(0)
             pygame.display.flip()
+
+    def draw(self):
+        text_score_headline = font.render("Your score: ", True, WHITE)
+        text_score = font_big.render(str(self.__score), True, YELLOW)
+        text_highscore_headline = font.render("Highscores:", True, WHITE)
+        game.screen.blit(text_score_headline, (window_size[0]/12, window_size[1]/(6*5)))
+        game.screen.blit(text_score, (window_size[0]/8, window_size[1]/3))
+        game.screen.blit(text_highscore_headline, (window_size[0]/32*21, window_size[1]/(6*5)))
+        for i in range(len(self.__highscores)):
+            if self.__highscores[i] == self.__score and self.__score != 0:
+                text_highscore = font.render(str(self.__highscores[i]), True, YELLOW)
+                game.screen.blit(text_highscore, (window_size[0]/4*3, window_size[1]/(6*5) + 115*(i+1)))
+                continue
+
+            text_highscore = font.render(str(self.__highscores[i]), True, WHITE)
+            game.screen.blit(text_highscore, (window_size[0]/4*3, window_size[1]/(6*5) + 115*(i+1)))
+            
+
+
+        self.reload_button.draw()
+        self.menu_button.draw()
+        self.exit_button.draw()
 
     def checkWin(self, won):
         
@@ -357,20 +386,52 @@ class Files:
 class Menu:
     
     def __init__(self):
-        pass
+        self.__play_button = TextButton(window_size[0]/4, window_size[1]/4, "Play", 205)
+        self.__exit_button = TextButton(window_size[0]/4, window_size[1]/2, "Exit", 195)
+        self.__planets_button = TextButton(window_size[0]/4, window_size[1]/4*3, "Choose planet", 650)
+        self.__reset_highscore_button = TextButton(window_size[0]/4*3, window_size[1]/4, "Reset highscore", 710)
+        self.__weight_size_slider = Slider()
+        self.__zoom_slider = Slider()
 
     def draw(self):
-        pass
+        self.__play_button.draw()
+        self.__exit_button.draw()
+        self.__planets_button.draw()
+        self.__reset_highscore_button.draw()
+        self.__weight_size_slider.draw()
+        self.__zoom_slider.draw()    
 
-    def handle_buttons(self):
-        pass
-
-    def menu_loop(self):
+    def menuLoop(self):
         
         done = False
         while not done:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.QUIT
+                    exit(0)
+            game.screen.fill(VIOLET)
+            self.draw()
 
-        
+            if self.__play_button.checkClicked():
+                done = True
+                
+                try:
+                    game.endgame.done = True
+                except Exception as e:
+                    pass
+
+            if self.__reset_highscore_button.checkClicked():
+                game.reset_highscore()
+            if self.__exit_button.checkClicked():
+                pygame.QUIT
+                exit(0)
+
+            pygame.display.flip()
+
+
+class PlanetMenu:
+    pass
+
 
 class Button:
     
@@ -384,16 +445,18 @@ class Button:
 
 
 class TextButton:
-    def __init__(self, x_position, y_position, text):
-        self.__x_position = x_position
-        self.__y_position = y_position
+    def __init__(self, x_position, y_position, text, width=523, height=100):
+        self.__x_position = x_position - width/2
+        self.__y_position = y_position - height/2
         self.__text = text
+        self.__width = width
+        self.__height = height
 
     def draw(self):
         button_text = font.render(self.__text, True, WHITE)
-        self.button_rect = pygame.rect.Rect((self.__x_position, self.__y_position),(523, 100))
+        self.button_rect = pygame.rect.Rect((self.__x_position, self.__y_position),(self.__width, self.__height))
         pygame.draw.rect(game.screen, BLUE, self.button_rect, 0, 5)
-        game.screen.blit(button_text, (self.__x_position + 4, self.__y_position + 4))
+        game.screen.blit(button_text, (self.__x_position + 5, self.__y_position + 5))
     
     def checkClicked(self):
         mouse_position = pygame.mouse.get_pos()
@@ -403,7 +466,15 @@ class TextButton:
         else:
             return False
 
+
+class Slider:
+    def draw(self):
+        pass
+
 game = MainGame()
+
+menu = Menu()
+menu.menuLoop()
 
 while not game.done:
     print("\n--------------------\nLOG: Start the game!\n--------------------")
