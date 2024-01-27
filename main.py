@@ -373,9 +373,15 @@ class EndGame:
 class Files:
 
     def get_highscores():
-        with open("data/highscores.pickle", "rb") as reader:
-            highscores = pickle.load(reader)
-        return highscores
+
+        try:
+            with open("data/highscores.pickle", "rb") as reader:
+                highscores = pickle.load(reader)
+                return highscores
+        except FileNotFoundError as e:
+            game.reset_highscore()
+
+        
     
     def set_highscores(highscores):
         with open("data/highscores.pickle", "wb") as writer:
