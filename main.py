@@ -89,6 +89,9 @@ class Target:
 
     def get_width(self):
         return self.__width
+    
+    def get_area(self):
+        return self.__width*self.__height
 
     def draw(self):
         pygame.draw.rect(
@@ -296,9 +299,9 @@ class EndGame:
         self.exit_button = TextButton(window_size[0]/9*8, window_size[1]/9*8, "Exit", 195)
 
     def calcScore(self):
-        self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*100000/zoom/weight_radius)
+        self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area())
         if gravity_accel[planet] < 4.2:
-            self.__score = int(round(gravity_accel[planet]/self.__time_needed, 2)*100000/zoom/weight_radius/gravity_accel[planet]*4.2)
+            self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area()/gravity_accel[planet]*4.2)
     
     def calcHighscores(self):
         score_loose = self.__score
@@ -381,7 +384,7 @@ class EndGame:
             self.calcScore()
             print(f"LOG: Time needed: {self.__time_needed}s.")
             self.calcHighscores()
-            print(f"LOG: Your score is: {self.__score} points!")
+            print(f"LOG: Score: {self.__score}")
             
 
         else:
