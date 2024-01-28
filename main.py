@@ -305,6 +305,8 @@ class EndGame:
         for i in range(len(self.__highscores)):
                 if score_loose < self.__highscores[i]:
                     continue
+                elif score_loose == self.__highscores[i]:
+                    break
                 else:
                     print(f"LOG: The old highscore is: {self.__highscores[i]}")
                     highscore_loose = self.__highscores[i]
