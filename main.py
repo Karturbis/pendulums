@@ -160,17 +160,31 @@ class Throw:
         self.__velocity[1] += gravity_accel[planet]/fps
         self.__position_meters[0] += self.__velocity[0]/fps
         self.__position_meters[1] += self.__velocity[1]/fps
-        if not self.out_of_bound():
-            self.collision()
+        if not self.collision():
+            self.out_of_bound()
 
     def collision(self):
-        if self.__position_meters[1]+weight_radius/zoom >= game.target.get_position()[1]:
-            print("LOG: Collision on y-achsis")
-            if self.__position_meters[0]+weight_radius/zoom > game.target.get_position()[0] and self.__position_meters[0]-weight_radius/zoom < game.target.get_position()[0] + game.target.get_width()/zoom:
-                print("LOG: Collision on x-achsis")
+        if self.yCollision() and self. xCollision():
                 print("LOG: Exit game(Won)")
                 game.main_game = False
                 game.endGame(won=True)
+                return True
+        return False
+
+    
+    def yCollision(self):
+        if self.__position_meters[1] + weight_radius/zoom >= game.target.get_position()[1]:
+            print("LOG: Collision on y-achsis")
+            return True
+        else:
+            return False
+    
+    def xCollision(self):
+        if self.__position_meters[0] + weight_radius/zoom > game.target.get_position()[0] and self.__position_meters[0] - weight_radius/zoom < game.target.get_position()[0] + game.target.get_width()/zoom:
+                print("LOG: Collision on x-achsis")
+                return True
+        else:
+            return False
     
     def out_of_bound(self):
         if self.__position_meters[0]*zoom < 0 or self.__position_meters[0]*zoom > window_size[0]:
@@ -203,9 +217,7 @@ class MainGame:
         self.screen = pygame.display.set_mode(window_size)
         self.clock = pygame.time.Clock()
 
-
     def simulate(self):
-
         """This method calculates the position
         of all the objects in the game."""
         if self.pendulum.get_detached():
@@ -231,7 +243,6 @@ class MainGame:
     def reset_highscore(self):
             Files.set_highscores([0, 0, 0, 0, 0])
             print("LOG: highscore has beeen reset to zero.")
-
 
     def mainGame(self):
         pygame.mouse.set_visible(0)
@@ -268,6 +279,7 @@ class MainGame:
             self.draw()
             pygame.display.flip()
             self.clock.tick(fps)
+
         
     def endGame(self, won):
         self.endgame = EndGame()
@@ -314,8 +326,10 @@ class EndGame:
                     if event.key == K_ESCAPE:
                         menu = Menu()
                         menu.menuLoop()
+                        break
                     else:
                         self.done = True
+                        break
             if won:
                 game.screen.fill(GREEN)
             else:
@@ -323,9 +337,11 @@ class EndGame:
             self.draw()
             if self.reload_button.checkClicked():
                 self.done = True
+                break
             if self.menu_button.checkClicked():
                 menu = Menu()
                 menu.menuLoop()
+                break
             if self.exit_button.checkClicked():
                 pygame.QUIT
                 exit(0)
