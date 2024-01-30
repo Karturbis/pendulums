@@ -484,10 +484,10 @@ class TextButton:
         self.__text = text
         self.__width = width
         self.__height = height
+        self.button_rect = pygame.rect.Rect((self.__x_position, self.__y_position),(self.__width, self.__height))
 
     def draw(self):
-        button_text = font.render(self.__text, True, WHITE)
-        self.button_rect = pygame.rect.Rect((self.__x_position, self.__y_position),(self.__width, self.__height))
+        button_text = font.render(self.__text, True, WHITE)   
         pygame.draw.rect(game.screen, BLUE, self.button_rect, 0, 5)
         game.screen.blit(button_text, (self.__x_position + 5, self.__y_position + 5))
     
@@ -501,6 +501,13 @@ class TextButton:
 
 
 class Slider:
+    def __init__(self): # self, x_position, y_position, width, height
+       #self.__x_position = x_position
+        #self.__y_position = y_position
+        #self.__width = width
+        #self.__height = height
+        pass
+
     def draw(self):
         pass
 
