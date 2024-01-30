@@ -55,13 +55,13 @@ VIOLET = (100, 0, 70)
 YELLOW = (255, 194, 0)
 
 # Settings:
-window_size = (1920, 860)
-background_color = BLUE
-target_color = YELLOW
-weight_radius = 14
-planet = "earth"
-zoom = 195 # min 120, max 270
-fps = 60
+WINDOW_SIZE = (1920, 860)
+BACKGROUND_COLOR = BLUE
+TARGET_COLOR = YELLOW
+WEIGHT_RADIUS = 14
+PLANET = "jupiter"
+ZOOM = 195 # min 120, max 270
+FPS = 60
 
 pygame.init()
 pygame.display.set_caption("Pendulums")
@@ -78,12 +78,12 @@ class Target:
     def __init__(self):
         self.__width = 120
         self.__height = 20
-        self.__position_pixels = [random.randint(0, window_size[0]-self.__width), window_size[1]-self.__height]
+        self.__position_pixels = [random.randint(0, WINDOW_SIZE[0]-self.__width), WINDOW_SIZE[1]-self.__height]
     
     def get_position(self):
         position_meters = [
-            self.__position_pixels[0]/zoom,
-            self.__position_pixels[1]/zoom
+            self.__position_pixels[0]/ZOOM,
+            self.__position_pixels[1]/ZOOM
         ]
         return position_meters
 
@@ -95,7 +95,7 @@ class Target:
 
     def draw(self):
         pygame.draw.rect(
-            game.screen, target_color,
+            game.screen, TARGET_COLOR,
             (self.__position_pixels,
             (self.__width, self.__height)
             )
@@ -109,7 +109,7 @@ class Pendulum:
     until the weight is detached. Then it only represents the cord."""
 
     __cord_len = 2 # in meters
-    pendulum_fixpoint = (window_size[0]/zoom/2, 1) # in meters
+    pendulum_fixpoint = (WINDOW_SIZE[0]/ZOOM/2, 1) # in meters
 
     def __init__(self):
         self.__detached = False
@@ -133,18 +133,18 @@ class Pendulum:
     
     def simulate(self):
 
-        self.__acceleration_arc = -gravity_accel[planet] * math.sin(self.__displacement_arc/self.__cord_len)
-        self.__velocity_arc += self.__acceleration_arc/fps # see comment below:
-        self.__displacement_arc += self.__velocity_arc/fps # dividing by fps to get seconds in the calculation. E.G if this is done 60 times per second, the displacement is raised by the velocity (m/s²) every second.
+        self.__acceleration_arc = -gravity_accel[PLANET] * math.sin(self.__displacement_arc/self.__cord_len)
+        self.__velocity_arc += self.__acceleration_arc/FPS # see comment below:
+        self.__displacement_arc += self.__velocity_arc/FPS # dividing by fps to get seconds in the calculation. E.G if this is done 60 times per second, the displacement is raised by the velocity (m/s²) every second.
         self.__angle = self.__displacement_arc/self.__cord_len
         self.__position_meters = [
             self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.__angle),
             self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.__angle)
         ]
-        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
+        self.__position_pixels = [self.__position_meters[0]*ZOOM, self.__position_meters[1]*ZOOM]
 
     def draw(self):
-        pygame.draw.circle(game.screen, WHITE, self.__position_pixels, weight_radius)
+        pygame.draw.circle(game.screen, WHITE, self.__position_pixels, WEIGHT_RADIUS)
 
 
 class Throw:
@@ -160,9 +160,9 @@ class Throw:
         self.__velocity = velocity
 
     def simulate(self):
-        self.__velocity[1] += gravity_accel[planet]/fps
-        self.__position_meters[0] += self.__velocity[0]/fps
-        self.__position_meters[1] += self.__velocity[1]/fps
+        self.__velocity[1] += gravity_accel[PLANET]/FPS
+        self.__position_meters[0] += self.__velocity[0]/FPS
+        self.__position_meters[1] += self.__velocity[1]/FPS
         if not self.collision():
             self.out_of_bound()
 
@@ -176,34 +176,34 @@ class Throw:
 
     
     def yCollision(self):
-        if self.__position_meters[1] + weight_radius/zoom >= game.target.get_position()[1]:
+        if self.__position_meters[1] + WEIGHT_RADIUS/ZOOM >= game.target.get_position()[1]:
             print("LOG: Collision on y-achsis")
             return True
         else:
             return False
     
     def xCollision(self):
-        if self.__position_meters[0] + weight_radius/zoom > game.target.get_position()[0] and self.__position_meters[0] - weight_radius/zoom < game.target.get_position()[0] + game.target.get_width()/zoom:
+        if self.__position_meters[0] + WEIGHT_RADIUS/ZOOM > game.target.get_position()[0] and self.__position_meters[0] - WEIGHT_RADIUS/ZOOM < game.target.get_position()[0] + game.target.get_width()/ZOOM:
                 print("LOG: Collision on x-achsis")
                 return True
         else:
             return False
     
     def out_of_bound(self):
-        if self.__position_meters[0]*zoom < 0 or self.__position_meters[0]*zoom > window_size[0]:
+        if self.__position_meters[0]*ZOOM < 0 or self.__position_meters[0]*ZOOM > WINDOW_SIZE[0]:
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
-        if self.__position_meters[1]*zoom < 0 or self.__position_meters[1]*zoom > window_size[1]:
+        if self.__position_meters[1]*ZOOM < 0 or self.__position_meters[1]*ZOOM > WINDOW_SIZE[1]:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
 
     def draw(self):
-        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
-        pygame.draw.circle(game.screen, WHITE, self.__position_pixels, weight_radius)
+        self.__position_pixels = [self.__position_meters[0]*ZOOM, self.__position_meters[1]*ZOOM]
+        pygame.draw.circle(game.screen, WHITE, self.__position_pixels, WEIGHT_RADIUS)
 
 
 class MainGame:
@@ -217,7 +217,7 @@ class MainGame:
         self.start_game = True
         self.main_game = True
         self.done = False
-        self.screen = pygame.display.set_mode(window_size)
+        self.screen = pygame.display.set_mode(WINDOW_SIZE)
         self.clock = pygame.time.Clock()
 
     def simulate(self):
@@ -237,7 +237,7 @@ class MainGame:
 
     def draw_pendulum_cord(self):
         position = self.pendulum.get_position_pixles()
-        fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*zoom, Pendulum.pendulum_fixpoint[1]*zoom]
+        fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*ZOOM, Pendulum.pendulum_fixpoint[1]*ZOOM]
         pygame.draw.line(self.screen, WHITE, position, fixpoint_pixels, 2)
 
     def make_throw(self, position_meters, velocity):
@@ -277,11 +277,11 @@ class MainGame:
                     elif not self.pendulum.get_detached():
                             self.pendulum.detach()
                     
-            self.screen.fill(background_color)
+            self.screen.fill(BACKGROUND_COLOR)
             self.simulate()
             self.draw()
             pygame.display.flip()
-            self.clock.tick(fps)
+            self.clock.tick(FPS)
 
         
     def endGame(self, won):
@@ -294,21 +294,21 @@ class EndGame:
 
     def __init__(self):
         pygame.mouse.set_visible(1)
-        self.menu_button = TextButton(window_size[0]/8, window_size[1]/9*8, "Menu", 255)
-        self.reload_button = TextButton(window_size[0]/2, window_size[1]/9*8, "Play again!", 500)
-        self.exit_button = TextButton(window_size[0]/9*8, window_size[1]/9*8, "Exit", 195)
+        self.menu_button = TextButton(WINDOW_SIZE[0]/8, WINDOW_SIZE[1]/9*8, "Menu", 255)
+        self.reload_button = TextButton(WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/9*8, "Play again!", 500)
+        self.exit_button = TextButton(WINDOW_SIZE[0]/9*8, WINDOW_SIZE[1]/9*8, "Exit", 195)
 
     def calcScore(self):
-        self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area())
-        if gravity_accel[planet] < 4.2:
-            self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area()/gravity_accel[planet]*4.2)
+        self.__score = int(round(gravity_accel[PLANET]/((self.__time_needed)/2))*40000000/ZOOM/WEIGHT_RADIUS/game.target.get_area())
+        if gravity_accel[PLANET] < 4.2:
+            self.__score = int(round(gravity_accel[PLANET]/((self.__time_needed)/2))*40000000/ZOOM/WEIGHT_RADIUS/game.target.get_area()/gravity_accel[PLANET]*4.2)
     
     def calcHighscores(self):
         score_loose = self.__score
         for i in range(len(self.__highscores)):
                 if score_loose < self.__highscores[i]:
                     continue
-                elif score_loose == self.__highscores[i]:
+                if score_loose == self.__highscores[i]:
                     break
                 else:
                     print(f"LOG: The old highscore is: {self.__highscores[i]}")
@@ -356,17 +356,17 @@ class EndGame:
         text_score_headline = font.render("Your score: ", True, WHITE)
         text_score = font_big.render(str(self.__score), True, YELLOW)
         text_highscore_headline = font.render("Highscores:", True, WHITE)
-        game.screen.blit(text_score_headline, (window_size[0]/12, window_size[1]/(6*5)))
-        game.screen.blit(text_score, (window_size[0]/8, window_size[1]/3))
-        game.screen.blit(text_highscore_headline, (window_size[0]/32*21, window_size[1]/(6*5)))
+        game.screen.blit(text_score_headline, (WINDOW_SIZE[0]/12, WINDOW_SIZE[1]/(6*5)))
+        game.screen.blit(text_score, (WINDOW_SIZE[0]/8, WINDOW_SIZE[1]/3))
+        game.screen.blit(text_highscore_headline, (WINDOW_SIZE[0]/32*21, WINDOW_SIZE[1]/(6*5)))
         for i in range(len(self.__highscores)):
             if self.__highscores[i] == self.__score and self.__score != 0:
                 text_highscore = font.render(str(self.__highscores[i]), True, YELLOW)
-                game.screen.blit(text_highscore, (window_size[0]/4*3, window_size[1]/(6*5) + 115*(i+1)))
+                game.screen.blit(text_highscore, (WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/(6*5) + 115*(i+1)))
                 continue
 
             text_highscore = font.render(str(self.__highscores[i]), True, WHITE) # the true enables anti-aliasing, White is the color of the text.
-            game.screen.blit(text_highscore, (window_size[0]/4*3, window_size[1]/(6*5) + 115*(i+1)))
+            game.screen.blit(text_highscore, (WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/(6*5) + 115*(i+1)))
             
 
 
@@ -415,12 +415,12 @@ class Menu:
     
     def __init__(self):
         pygame.mouse.set_visible(1)
-        self.__play_button = TextButton(window_size[0]/4, window_size[1]/4, "Play", 205)
-        self.__exit_button = TextButton(window_size[0]/4, window_size[1]/2, "Exit", 195)
-        self.__planets_button = TextButton(window_size[0]/4, window_size[1]/4*3, "Choose planet", 650)
-        self.__reset_highscore_button = TextButton(window_size[0]/4*3, window_size[1]/4, "Reset highscore", 710)
-        self.__weight_size_slider = Slider()
-        self.__zoom_slider = Slider()
+        self.__play_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4, "Play", 205)
+        self.__exit_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/2, "Exit", 195)
+        self.__planets_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4*3, "Choose planet", 650)
+        self.__reset_highscore_button = TextButton(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4, "Reset highscore", 710)
+        self.__weight_size_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2)
+        self.__zoom_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4*3)
 
     def draw(self):
         self.__play_button.draw()
@@ -439,19 +439,31 @@ class Menu:
                     pygame.QUIT
                     exit(0)
                 if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
+                    if event.key == pygame.K_ESCAPE:
                        pygame.QUIT
                        exit(0)
+                    if event.key == pygame.K_RETURN:
+                        done = True
+                        try:
+                            game.endgame.done = True
+                        except Exception as e:
+                            pass
+                        
+                if event.type == pygame.MOUSEWHEEL:
+                    print(event.y)
+
             game.screen.fill(VIOLET)
             self.draw()
 
             if self.__play_button.checkClicked():
                 done = True
-                
                 try:
                     game.endgame.done = True
                 except Exception as e:
                     pass
+            
+            self.__weight_size_slider.checkMoved()
+            self.__zoom_slider.checkMoved()
 
             if self.__reset_highscore_button.checkClicked():
                 game.reset_highscore()
@@ -501,15 +513,33 @@ class TextButton:
 
 
 class Slider:
-    def __init__(self): # self, x_position, y_position, width, height
-       #self.__x_position = x_position
-        #self.__y_position = y_position
-        #self.__width = width
-        #self.__height = height
-        pass
+    def __init__(self, x_position, y_position, width=700, height=100):
+        self.__x_position = x_position - width/2
+        self.__y_position = y_position - height/2
+        self.__x_start_position = x_position
+        self.__slider_width = width/25
+        self.__slider_value = 50
+        self.__slider_x_position = x_position - self.__slider_width/ 100*self.__slider_value
+        self.__width = width
+        self.__height = height
+        self.container_rect = pygame.rect.Rect((self.__x_position, self.__y_position), (self.__width, self.__height))
 
     def draw(self):
-        pass
+        self.slider_rect = pygame.rect.Rect((self.__slider_x_position, self.__y_position), (self.__slider_width, self.__height))
+        pygame.draw.rect(game.screen, BLUE, self.container_rect, 0, 5)
+        pygame.draw.rect(game.screen, YELLOW, self.slider_rect, 0, 5)
+
+    def get_value(self):
+        return self.__slider_value
+    
+    def checkMoved(self):
+        mouse_position = pygame.mouse.get_pos()
+        left_click = pygame.mouse.get_pressed()[0]
+        if left_click and self.container_rect.collidepoint(mouse_position):
+            self.__slider_x_position = mouse_position[0]
+            self.__slider_value = int(((self.__slider_x_position - self.__x_position) /(self.__width/2)*100+1)/2)
+            print(f"LOG: Slider value: {self.__slider_value}")
+        
 
 game = MainGame()
 
@@ -521,8 +551,3 @@ while not game.done:
     game.start_game = True
     game.main_game = True
     game.loop()
-
-
-
-
-
