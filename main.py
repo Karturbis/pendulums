@@ -247,7 +247,7 @@ class MainGame:
             Files.set_highscores([0, 0, 0, 0, 0])
             print("LOG: highscore has beeen reset to zero.")
 
-    def mainGame(self):
+    def loop(self):
         pygame.mouse.set_visible(0)
         while self.main_game:
 
@@ -273,7 +273,7 @@ class MainGame:
                     print("LOG: KEYDOWN")
                     if event.key == K_ESCAPE:
                         menu = Menu()
-                        menu.menuLoop()
+                        menu.loop()
                     elif not self.pendulum.get_detached():
                             self.pendulum.detach()
                     
@@ -287,7 +287,7 @@ class MainGame:
     def endGame(self, won):
         self.endgame = EndGame()
         self.endgame.checkWin(won)
-        self.endgame.endGameLoop(won)
+        self.endgame.loop(won)
 
 
 class EndGame:
@@ -320,7 +320,7 @@ class EndGame:
     def calcTime(self):
         self.__time_needed = round(pygame.time.get_ticks()/1000 - game.start_ticks/1000, 3)
 
-    def endGameLoop(self, won):
+    def loop(self, won):
         self.done = False
         while not self.done:
             for event in pygame.event.get():
@@ -330,7 +330,7 @@ class EndGame:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         menu = Menu()
-                        menu.menuLoop()
+                        menu.loop()
                         break
                     else:
                         self.done = True
@@ -345,7 +345,7 @@ class EndGame:
                 break
             if self.menu_button.checkClicked():
                 menu = Menu()
-                menu.menuLoop()
+                menu.loop()
                 break
             if self.exit_button.checkClicked():
                 pygame.QUIT
@@ -365,7 +365,7 @@ class EndGame:
                 game.screen.blit(text_highscore, (window_size[0]/4*3, window_size[1]/(6*5) + 115*(i+1)))
                 continue
 
-            text_highscore = font.render(str(self.__highscores[i]), True, WHITE)
+            text_highscore = font.render(str(self.__highscores[i]), True, WHITE) # the true enables anti-aliasing, White is the color of the text.
             game.screen.blit(text_highscore, (window_size[0]/4*3, window_size[1]/(6*5) + 115*(i+1)))
             
 
@@ -430,7 +430,7 @@ class Menu:
         self.__weight_size_slider.draw()
         self.__zoom_slider.draw()    
 
-    def menuLoop(self):
+    def loop(self):
         
         done = False
         while not done:
@@ -507,13 +507,13 @@ class Slider:
 game = MainGame()
 
 menu = Menu()
-menu.menuLoop()
+menu.loop()
 
 while not game.done:
     print("\n--------------------\nLOG: Start the game!\n--------------------")
     game.start_game = True
     game.main_game = True
-    game.mainGame()
+    game.loop()
 
 
 
