@@ -442,7 +442,7 @@ class Menu:
                     if event.key == pygame.K_ESCAPE:
                        pygame.QUIT
                        exit(0)
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
                         done = True
                         try:
                             game.endgame.done = True
