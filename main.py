@@ -61,7 +61,7 @@ TARGET_COLOR = YELLOW
 WEIGHT_RADIUS = 14
 PLANET = "jupiter"
 ZOOM = 195 # min 120, max 270
-FPS = 60
+FPS = 120
 
 pygame.init()
 pygame.display.set_caption("Pendulums")
@@ -449,27 +449,33 @@ class Menu:
                         except Exception as e:
                             pass
                         
+                if event.type == MOUSEBUTTONDOWN:
+                    if self.__play_button.checkClicked():
+                        done = True
+                        try:
+                            game.endgame.done = True
+                        except Exception as e:
+                            pass
+                    if self.__reset_highscore_button.checkClicked():
+                        game.reset_highscore()
+                    if self.__exit_button.checkClicked():
+                        pygame.QUIT
+                        exit(0)
+
                 if event.type == pygame.MOUSEWHEEL:
                     print(event.y)
 
             game.screen.fill(VIOLET)
             self.draw()
 
-            if self.__play_button.checkClicked():
-                done = True
-                try:
-                    game.endgame.done = True
-                except Exception as e:
-                    pass
+            
             
             self.__weight_size_slider.checkMoved()
             self.__zoom_slider.checkMoved()
 
-            if self.__reset_highscore_button.checkClicked():
-                game.reset_highscore()
-            if self.__exit_button.checkClicked():
-                pygame.QUIT
-                exit(0)
+
+
+
 
             pygame.display.flip()
 
@@ -504,30 +510,30 @@ class TextButton:
         game.screen.blit(button_text, (self.__x_position + 5, self.__y_position + 5))
     
     def checkClicked(self):
-        mouse_position = pygame.mouse.get_pos()
         left_click = pygame.mouse.get_pressed()[0]
+        mouse_position = pygame.mouse.get_pos()
         if left_click and self.button_rect.collidepoint(mouse_position):
             return True
         else:
             return False
 
-
 class Slider:
     def __init__(self, x_position, y_position, width=700, height=100):
         self.__x_position = x_position - width/2
         self.__y_position = y_position - height/2
-        self.__x_start_position = x_position
+        self.__x_right_position = x_position + width/2
         self.__slider_width = width/25
         self.__slider_value = 50
-        self.__slider_x_position = x_position - self.__slider_width/ 100*self.__slider_value
+        self.__slider_x_position = x_position
         self.__width = width
         self.__height = height
-        self.container_rect = pygame.rect.Rect((self.__x_position, self.__y_position), (self.__width, self.__height))
+        self.__container_rect = pygame.rect.Rect((self.__x_position, self.__y_position), (self.__width, self.__height))
+        self.__container_collision = False
 
     def draw(self):
-        self.slider_rect = pygame.rect.Rect((self.__slider_x_position, self.__y_position), (self.__slider_width, self.__height))
-        pygame.draw.rect(game.screen, BLUE, self.container_rect, 0, 5)
-        pygame.draw.rect(game.screen, YELLOW, self.slider_rect, 0, 5)
+        self.__slider_rect = pygame.rect.Rect((self.__slider_x_position - self.__slider_width/2, self.__y_position), (self.__slider_width, self.__height))
+        pygame.draw.rect(game.screen, BLUE, self.__container_rect, 0, 5)
+        pygame.draw.rect(game.screen, YELLOW, self.__slider_rect, 0, 5)
 
     def get_value(self):
         return self.__slider_value
@@ -535,11 +541,20 @@ class Slider:
     def checkMoved(self):
         mouse_position = pygame.mouse.get_pos()
         left_click = pygame.mouse.get_pressed()[0]
-        if left_click and self.container_rect.collidepoint(mouse_position):
-            self.__slider_x_position = mouse_position[0]
-            self.__slider_value = int(((self.__slider_x_position - self.__x_position) /(self.__width/2)*100+1)/2)
-            print(f"LOG: Slider value: {self.__slider_value}")
         
+        if left_click:
+            if self.__container_collision:
+                self.__slider_x_position = mouse_position[0]
+                if self.__slider_x_position - self.__slider_width/2 < self.__x_position:
+                    self.__slider_x_position = self.__x_position + self.__slider_width/2
+                if self.__slider_x_position + self.__slider_width/2 > self.__x_right_position:
+                    self.__slider_x_position = self.__x_right_position - self.__slider_width/2
+                self.__slider_value = int((((self.__slider_x_position - self.__slider_width/2 - self.__x_position)) / (self.__width-self.__slider_width)*100))
+                print(f"LOG: Slider value: {self.__slider_value}")
+        elif self.__container_rect.collidepoint(mouse_position):
+            self.__container_collision = True
+        else:
+            self.__container_collision = False
 
 game = MainGame()
 
