@@ -301,9 +301,9 @@ class EndGame:
         self.exit_button = TextButton(WINDOW_SIZE[0]/9*8, WINDOW_SIZE[1]/9*8, "Exit", 195)
 
     def calcScore(self):
-        self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*40000000/zoom/weight_radius/game.target.get_area())
+        self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area())
         if gravity_accel[planet] < 4.2:
-            self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*40000000/zoom/weight_radius/game.target.get_area()/gravity_accel[planet]*4.2)
+            self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area()/gravity_accel[planet]*4.2)
     
     def calcHighscores(self):
         score_loose = self.__score
