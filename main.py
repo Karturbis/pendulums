@@ -68,7 +68,6 @@ pygame.init()
 pygame.display.set_caption("Pendulums")
 font = pygame.font.Font("freesansbold.ttf", 90)
 font_big = pygame.font.Font("freesansbold.ttf", 200)
-reload_img = pygame.image.load("images/reload_btn.png")
 
 class Target:
 
@@ -486,17 +485,6 @@ class Menu:
 
 class PlanetMenu:
     pass
-
-
-class Button:
-    
-    def __init__(self, x_position, y_position, image):
-        self.__image = image
-        self.__rect = self.__image.get_rect()
-        self.__rect.topleft = (x_position, y_position)
-        
-    def draw(self):
-        SCREEN.blit(self.__image, (self.__rect.x, self.__rect.y))
 
 
 class TextButton:
