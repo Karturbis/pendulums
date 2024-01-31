@@ -59,7 +59,7 @@ WINDOW_SIZE = (1920, 860)
 BACKGROUND_COLOR = BLUE
 TARGET_COLOR = YELLOW
 WEIGHT_RADIUS = 14
-PLANET = "jupiter"
+PLANET = "earth"
 ZOOM = 195 # min 120, max 270
 FPS = 120
 
@@ -274,6 +274,9 @@ class MainGame:
                     if event.key == K_ESCAPE:
                         menu = Menu()
                         menu.loop()
+                    elif event.key == K_BACKSPACE:
+                        self.main_game = False
+                        self.endGame(won=False)
                     elif not self.pendulum.get_detached():
                             self.pendulum.detach()
                     
