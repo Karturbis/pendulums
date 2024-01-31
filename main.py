@@ -63,6 +63,7 @@ PLANET = "jupiter"
 ZOOM = 195 # min 120, max 270
 FPS = 120
 
+SCREEN = pygame.display.set_mode(WINDOW_SIZE)
 pygame.init()
 pygame.display.set_caption("Pendulums")
 font = pygame.font.Font("freesansbold.ttf", 90)
@@ -95,7 +96,7 @@ class Target:
 
     def draw(self):
         pygame.draw.rect(
-            game.screen, TARGET_COLOR,
+            SCREEN, TARGET_COLOR,
             (self.__position_pixels,
             (self.__width, self.__height)
             )
@@ -144,7 +145,7 @@ class Pendulum:
         self.__position_pixels = [self.__position_meters[0]*ZOOM, self.__position_meters[1]*ZOOM]
 
     def draw(self):
-        pygame.draw.circle(game.screen, WHITE, self.__position_pixels, WEIGHT_RADIUS)
+        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, WEIGHT_RADIUS)
 
 
 class Throw:
@@ -203,7 +204,7 @@ class Throw:
 
     def draw(self):
         self.__position_pixels = [self.__position_meters[0]*ZOOM, self.__position_meters[1]*ZOOM]
-        pygame.draw.circle(game.screen, WHITE, self.__position_pixels, WEIGHT_RADIUS)
+        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, WEIGHT_RADIUS)
 
 
 class MainGame:
@@ -217,7 +218,6 @@ class MainGame:
         self.start_game = True
         self.main_game = True
         self.done = False
-        self.screen = pygame.display.set_mode(WINDOW_SIZE)
         self.clock = pygame.time.Clock()
 
     def simulate(self):
@@ -238,7 +238,7 @@ class MainGame:
     def draw_pendulum_cord(self):
         position = self.pendulum.get_position_pixles()
         fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*ZOOM, Pendulum.pendulum_fixpoint[1]*ZOOM]
-        pygame.draw.line(self.screen, WHITE, position, fixpoint_pixels, 2)
+        pygame.draw.line(SCREEN, WHITE, position, fixpoint_pixels, 2)
 
     def make_throw(self, position_meters, velocity):
         self.throw = Throw(position_meters, velocity)
@@ -277,7 +277,7 @@ class MainGame:
                     elif not self.pendulum.get_detached():
                             self.pendulum.detach()
                     
-            self.screen.fill(BACKGROUND_COLOR)
+            SCREEN.fill(BACKGROUND_COLOR)
             self.simulate()
             self.draw()
             pygame.display.flip()
@@ -336,9 +336,9 @@ class EndGame:
                         self.done = True
                         break
             if won:
-                game.screen.fill(GREEN)
+                SCREEN.fill(GREEN)
             else:
-                game.screen.fill(RED)
+                SCREEN.fill(RED)
             self.draw()
             if self.reload_button.checkClicked():
                 self.done = True
@@ -356,17 +356,17 @@ class EndGame:
         text_score_headline = font.render("Your score: ", True, WHITE)
         text_score = font_big.render(str(self.__score), True, YELLOW)
         text_highscore_headline = font.render("Highscores:", True, WHITE)
-        game.screen.blit(text_score_headline, (WINDOW_SIZE[0]/12, WINDOW_SIZE[1]/(6*5)))
-        game.screen.blit(text_score, (WINDOW_SIZE[0]/8, WINDOW_SIZE[1]/3))
-        game.screen.blit(text_highscore_headline, (WINDOW_SIZE[0]/32*21, WINDOW_SIZE[1]/(6*5)))
+        SCREEN.blit(text_score_headline, (WINDOW_SIZE[0]/12, WINDOW_SIZE[1]/(6*5)))
+        SCREEN.blit(text_score, (WINDOW_SIZE[0]/8, WINDOW_SIZE[1]/3))
+        SCREEN.blit(text_highscore_headline, (WINDOW_SIZE[0]/32*21, WINDOW_SIZE[1]/(6*5)))
         for i in range(len(self.__highscores)):
             if self.__highscores[i] == self.__score and self.__score != 0:
                 text_highscore = font.render(str(self.__highscores[i]), True, YELLOW)
-                game.screen.blit(text_highscore, (WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/(6*5) + 115*(i+1)))
+                SCREEN.blit(text_highscore, (WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/(6*5) + 115*(i+1)))
                 continue
 
             text_highscore = font.render(str(self.__highscores[i]), True, WHITE) # the true enables anti-aliasing, White is the color of the text.
-            game.screen.blit(text_highscore, (WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/(6*5) + 115*(i+1)))
+            SCREEN.blit(text_highscore, (WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/(6*5) + 115*(i+1)))
             
 
 
@@ -418,7 +418,7 @@ class Menu:
         self.__play_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4, "Play", 205)
         self.__exit_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/2, "Exit", 195)
         self.__planets_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4*3, "Choose planet", 650)
-        self.__reset_highscore_button = TextButton(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4, "Reset highscore", 710)
+        self.__reset_highscore_button = TextButton(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4, "Reset highscore", 720)
         self.__weight_size_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2)
         self.__zoom_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4*3)
 
@@ -465,7 +465,7 @@ class Menu:
                 if event.type == pygame.MOUSEWHEEL:
                     print(event.y)
 
-            game.screen.fill(VIOLET)
+            SCREEN.fill(VIOLET)
             self.draw()
 
             
@@ -492,7 +492,7 @@ class Button:
         self.__rect.topleft = (x_position, y_position)
         
     def draw(self):
-        game.screen.blit(self.__image, (self.__rect.x, self.__rect.y))
+        SCREEN.blit(self.__image, (self.__rect.x, self.__rect.y))
 
 
 class TextButton:
@@ -506,8 +506,8 @@ class TextButton:
 
     def draw(self):
         button_text = font.render(self.__text, True, WHITE)   
-        pygame.draw.rect(game.screen, BLUE, self.button_rect, 0, 5)
-        game.screen.blit(button_text, (self.__x_position + 5, self.__y_position + 5))
+        pygame.draw.rect(SCREEN, BLUE, self.button_rect, 0, 5)
+        SCREEN.blit(button_text, (self.__x_position + 5, self.__y_position + 5))
     
     def checkClicked(self):
         left_click = pygame.mouse.get_pressed()[0]
@@ -532,8 +532,8 @@ class Slider:
 
     def draw(self):
         self.__slider_rect = pygame.rect.Rect((self.__slider_x_position - self.__slider_width/2, self.__y_position), (self.__slider_width, self.__height))
-        pygame.draw.rect(game.screen, BLUE, self.__container_rect, 0, 5)
-        pygame.draw.rect(game.screen, YELLOW, self.__slider_rect, 0, 5)
+        pygame.draw.rect(SCREEN, BLUE, self.__container_rect, 0, 5)
+        pygame.draw.rect(SCREEN, YELLOW, self.__slider_rect, 0, 5)
 
     def get_value(self):
         return self.__slider_value
