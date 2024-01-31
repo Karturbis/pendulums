@@ -58,9 +58,9 @@ YELLOW = (255, 194, 0)
 WINDOW_SIZE = (1920, 860)
 BACKGROUND_COLOR = BLUE
 TARGET_COLOR = YELLOW
-WEIGHT_RADIUS = 14
-PLANET = "earth"
-ZOOM = 195 # min 120, max 270
+weight_radius = 14
+planet = "earth"
+zoom = 195 # min 120, max 270
 FPS = 120
 
 SCREEN = pygame.display.set_mode(WINDOW_SIZE)
@@ -83,8 +83,8 @@ class Target:
     
     def get_position(self):
         position_meters = [
-            self.__position_pixels[0]/ZOOM,
-            self.__position_pixels[1]/ZOOM
+            self.__position_pixels[0]/zoom,
+            self.__position_pixels[1]/zoom
         ]
         return position_meters
 
@@ -110,7 +110,7 @@ class Pendulum:
     until the weight is detached. Then it only represents the cord."""
 
     __cord_len = 2 # in meters
-    pendulum_fixpoint = (WINDOW_SIZE[0]/ZOOM/2, 1) # in meters
+    pendulum_fixpoint = (WINDOW_SIZE[0]/zoom/2, 1) # in meters
 
     def __init__(self):
         self.__detached = False
@@ -134,7 +134,7 @@ class Pendulum:
     
     def simulate(self):
 
-        self.__acceleration_arc = -gravity_accel[PLANET] * math.sin(self.__displacement_arc/self.__cord_len)
+        self.__acceleration_arc = -gravity_accel[planet] * math.sin(self.__displacement_arc/self.__cord_len)
         self.__velocity_arc += self.__acceleration_arc/FPS # see comment below:
         self.__displacement_arc += self.__velocity_arc/FPS # dividing by fps to get seconds in the calculation. E.G if this is done 60 times per second, the displacement is raised by the velocity (m/s²) every second.
         self.__angle = self.__displacement_arc/self.__cord_len
@@ -142,10 +142,10 @@ class Pendulum:
             self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.__angle),
             self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.__angle)
         ]
-        self.__position_pixels = [self.__position_meters[0]*ZOOM, self.__position_meters[1]*ZOOM]
+        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
 
     def draw(self):
-        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, WEIGHT_RADIUS)
+        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, weight_radius)
 
 
 class Throw:
@@ -161,7 +161,7 @@ class Throw:
         self.__velocity = velocity
 
     def simulate(self):
-        self.__velocity[1] += gravity_accel[PLANET]/FPS
+        self.__velocity[1] += gravity_accel[planet]/FPS
         self.__position_meters[0] += self.__velocity[0]/FPS
         self.__position_meters[1] += self.__velocity[1]/FPS
         if not self.collision():
@@ -177,34 +177,34 @@ class Throw:
 
     
     def yCollision(self):
-        if self.__position_meters[1] + WEIGHT_RADIUS/ZOOM >= game.target.get_position()[1]:
+        if self.__position_meters[1] + weight_radius/zoom >= game.target.get_position()[1]:
             print("LOG: Collision on y-achsis")
             return True
         else:
             return False
     
     def xCollision(self):
-        if self.__position_meters[0] + WEIGHT_RADIUS/ZOOM > game.target.get_position()[0] and self.__position_meters[0] - WEIGHT_RADIUS/ZOOM < game.target.get_position()[0] + game.target.get_width()/ZOOM:
+        if self.__position_meters[0] + weight_radius/zoom > game.target.get_position()[0] and self.__position_meters[0] - weight_radius/zoom < game.target.get_position()[0] + game.target.get_width()/zoom:
                 print("LOG: Collision on x-achsis")
                 return True
         else:
             return False
     
     def out_of_bound(self):
-        if self.__position_meters[0]*ZOOM < 0 or self.__position_meters[0]*ZOOM > WINDOW_SIZE[0]:
+        if self.__position_meters[0]*zoom < 0 or self.__position_meters[0]*zoom > WINDOW_SIZE[0]:
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
-        if self.__position_meters[1]*ZOOM < 0 or self.__position_meters[1]*ZOOM > WINDOW_SIZE[1]:
+        if self.__position_meters[1]*zoom < 0 or self.__position_meters[1]*zoom > WINDOW_SIZE[1]:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
 
     def draw(self):
-        self.__position_pixels = [self.__position_meters[0]*ZOOM, self.__position_meters[1]*ZOOM]
-        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, WEIGHT_RADIUS)
+        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
+        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, weight_radius)
 
 
 class MainGame:
@@ -237,7 +237,7 @@ class MainGame:
 
     def draw_pendulum_cord(self):
         position = self.pendulum.get_position_pixles()
-        fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*ZOOM, Pendulum.pendulum_fixpoint[1]*ZOOM]
+        fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*zoom, Pendulum.pendulum_fixpoint[1]*zoom]
         pygame.draw.line(SCREEN, WHITE, position, fixpoint_pixels, 2)
 
     def make_throw(self, position_meters, velocity):
@@ -302,9 +302,9 @@ class EndGame:
         self.exit_button = TextButton(WINDOW_SIZE[0]/9*8, WINDOW_SIZE[1]/9*8, "Exit", 195)
 
     def calcScore(self):
-        self.__score = int(round(gravity_accel[PLANET]/((self.__time_needed)/2))*40000000/ZOOM/WEIGHT_RADIUS/game.target.get_area())
-        if gravity_accel[PLANET] < 4.2:
-            self.__score = int(round(gravity_accel[PLANET]/((self.__time_needed)/2))*40000000/ZOOM/WEIGHT_RADIUS/game.target.get_area()/gravity_accel[PLANET]*4.2)
+        self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*40000000/zoom/weight_radius/game.target.get_area())
+        if gravity_accel[planet] < 4.2:
+            self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*40000000/zoom/weight_radius/game.target.get_area()/gravity_accel[planet]*4.2)
     
     def calcHighscores(self):
         score_loose = self.__score
@@ -474,6 +474,7 @@ class Menu:
             
             
             self.__weight_size_slider.checkMoved()
+            self.__weight_size_slider.get_value()
             self.__zoom_slider.checkMoved()
 
 
