@@ -508,6 +508,7 @@ class TextButton:
         else:
             return False
 
+
 class Slider:
     def __init__(self, x_position, y_position, width=700, height=100):
         self.__x_position = x_position - width/2
@@ -546,6 +547,7 @@ class Slider:
             self.__container_collision = True
         else:
             self.__container_collision = False
+
 
 game = MainGame()
 
