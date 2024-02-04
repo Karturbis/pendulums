@@ -5,13 +5,17 @@ In real life:        In this simulation:
 1 Second        =   1 Second (60 frames)
 
 In the physics calculations, SI-units are used.
+
+If in comments the word 'weight' is used, usually
+the thing at the end of the pendulum, or the thing
+that is doing the oblique throw, is meant.
 """
 
 # Imports:
-import math
-import random
-import pickle
-import pygame
+import math # for the calculations with angles and sqrt
+import random # for the setting the target and changing the planet
+import pickle # for saving the highscores to a file
+import pygame # for the display and a lot of other stuff
 from pygame.locals import *
 
 # Gravitational Accelerations:
