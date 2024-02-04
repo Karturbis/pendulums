@@ -57,9 +57,7 @@ YELLOW = (255, 194, 0)
 WINDOW_SIZE = (1920, 860)
 BACKGROUND_COLOR = BLUE
 TARGET_COLOR = YELLOW
-weight_radius = 14
-planet = "earth"
-zoom = 195 # min 120, max 270
+
 FPS = 120
 
 SCREEN = pygame.display.set_mode(WINDOW_SIZE)
@@ -68,7 +66,13 @@ pygame.display.set_caption("Pendulums")
 font = pygame.font.Font("freesansbold.ttf", 90)
 font_big = pygame.font.Font("freesansbold.ttf", 200)
 
-class Target:
+class Variables:
+    planet = "earth"
+    weight_radius = 5 # min 5, max 50
+    zoom = 220 # min 120, max 220
+
+
+class Target():
 
 
     """This class represents the target, which
@@ -81,8 +85,8 @@ class Target:
     
     def get_position(self):
         position_meters = [
-            self.__position_pixels[0]/zoom,
-            self.__position_pixels[1]/zoom
+            self.__position_pixels[0]/Variables.zoom,
+            self.__position_pixels[1]/Variables.zoom
         ]
         return position_meters
 
@@ -101,14 +105,14 @@ class Target:
         )
 
 
-class Pendulum:
+class Pendulum():
 
 
     """Class that represents the pendulum cord and the pendulum weight,
     until the weight is detached. Then it only represents the cord."""
 
     __cord_len = 2 # in meters
-    pendulum_fixpoint = (WINDOW_SIZE[0]/zoom/2, 1) # in meters
+    pendulum_fixpoint = (WINDOW_SIZE[0]/Variables.zoom/2, 1) # in meters
 
     def __init__(self):
         self.__detached = False
@@ -132,7 +136,7 @@ class Pendulum:
     
     def simulate(self):
 
-        self.__acceleration_arc = -gravity_accel[planet] * math.sin(self.__displacement_arc/self.__cord_len)
+        self.__acceleration_arc = -gravity_accel[Variables.planet] * math.sin(self.__displacement_arc/self.__cord_len)
         self.__velocity_arc += self.__acceleration_arc/FPS # see comment below:
         self.__displacement_arc += self.__velocity_arc/FPS # dividing by fps to get seconds in the calculation. E.G if this is done 60 times per second, the displacement is raised by the velocity (m/s²) every second.
         self.__angle = self.__displacement_arc/self.__cord_len
@@ -140,13 +144,13 @@ class Pendulum:
             self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.__angle),
             self.pendulum_fixpoint[1] + self.__cord_len*math.cos(self.__angle)
         ]
-        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
+        self.__position_pixels = [self.__position_meters[0]*Variables.zoom, self.__position_meters[1]*Variables.zoom]
 
     def draw(self):
-        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, weight_radius)
+        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, Variables.weight_radius)
 
 
-class Throw:
+class Throw():
 
 
     """This class represents the pendulum weight when it is
@@ -159,7 +163,7 @@ class Throw:
         self.__velocity = velocity
 
     def simulate(self):
-        self.__velocity[1] += gravity_accel[planet]/FPS
+        self.__velocity[1] += gravity_accel[Variables.planet]/FPS
         self.__position_meters[0] += self.__velocity[0]/FPS
         self.__position_meters[1] += self.__velocity[1]/FPS
         if not self.collision():
@@ -175,37 +179,37 @@ class Throw:
 
     
     def yCollision(self):
-        if self.__position_meters[1] + weight_radius/zoom >= game.target.get_position()[1]:
+        if self.__position_meters[1] + Variables.weight_radius/Variables.zoom >= game.target.get_position()[1]:
             print("LOG: Collision on y-achsis")
             return True
         else:
             return False
     
     def xCollision(self):
-        if self.__position_meters[0] + weight_radius/zoom > game.target.get_position()[0] and self.__position_meters[0] - weight_radius/zoom < game.target.get_position()[0] + game.target.get_width()/zoom:
+        if self.__position_meters[0] + Variables.weight_radius/Variables.zoom > game.target.get_position()[0] and self.__position_meters[0] - Variables.weight_radius/Variables.zoom < game.target.get_position()[0] + game.target.get_width()/Variables.zoom:
                 print("LOG: Collision on x-achsis")
                 return True
         else:
             return False
     
     def out_of_bound(self):
-        if self.__position_meters[0]*zoom < 0 or self.__position_meters[0]*zoom > WINDOW_SIZE[0]:
+        if self.__position_meters[0]*Variables.zoom < 0 or self.__position_meters[0]*Variables.zoom > WINDOW_SIZE[0]:
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
-        if self.__position_meters[1]*zoom < 0 or self.__position_meters[1]*zoom > WINDOW_SIZE[1]:
+        if self.__position_meters[1]*Variables.zoom < 0 or self.__position_meters[1]*Variables.zoom > WINDOW_SIZE[1]:
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
             game.endGame(won=False)
 
     def draw(self):
-        self.__position_pixels = [self.__position_meters[0]*zoom, self.__position_meters[1]*zoom]
-        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, weight_radius)
+        self.__position_pixels = [self.__position_meters[0]*Variables.zoom, self.__position_meters[1]*Variables.zoom]
+        pygame.draw.circle(SCREEN, WHITE, self.__position_pixels, Variables.weight_radius)
 
 
-class MainGame:
+class MainGame():
 
 
     """The game class redirects some tasks to the more
@@ -217,6 +221,7 @@ class MainGame:
         self.main_game = True
         self.done = False
         self.clock = pygame.time.Clock()
+
 
     def simulate(self):
         """This method calculates the position
@@ -235,7 +240,7 @@ class MainGame:
 
     def draw_pendulum_cord(self):
         position = self.pendulum.get_position_pixles()
-        fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*zoom, Pendulum.pendulum_fixpoint[1]*zoom]
+        fixpoint_pixels = [Pendulum.pendulum_fixpoint[0]*Variables.zoom, Pendulum.pendulum_fixpoint[1]*Variables.zoom]
         pygame.draw.line(SCREEN, WHITE, position, fixpoint_pixels, 2)
 
     def make_throw(self, position_meters, velocity):
@@ -291,7 +296,7 @@ class MainGame:
         self.endgame.loop(won)
 
 
-class EndGame:
+class EndGame():
 
     def __init__(self):
         pygame.mouse.set_visible(1)
@@ -300,9 +305,9 @@ class EndGame:
         self.exit_button = TextButton(WINDOW_SIZE[0]/9*8, WINDOW_SIZE[1]/9*8, "Exit", 195)
 
     def calcScore(self):
-        self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area())
-        if gravity_accel[planet] < 4.2:
-            self.__score = int(round(gravity_accel[planet]/((self.__time_needed)/2))*400000000/zoom/weight_radius/game.target.get_area()/gravity_accel[planet]*4.2)
+        self.__score = int(round(gravity_accel[Variables.planet]/((self.__time_needed)/2))*400000000/Variables.zoom/Variables.weight_radius/game.target.get_area())
+        if gravity_accel[Variables.planet] < 4.2:
+            self.__score = int(round(gravity_accel[Variables.planet]/((self.__time_needed)/2))*400000000/Variables.zoom/Variables.weight_radius/game.target.get_area()/gravity_accel[Variables.planet]*4.2)
     
     def calcHighscores(self):
         score_loose = self.__score
@@ -393,7 +398,7 @@ class EndGame:
             print(f"LOG: Time elapsed: {self.__time_needed}s.")
 
 
-class Files:
+class Files():
 
     def get_highscores():
 
@@ -412,16 +417,15 @@ class Files:
             pickle.dump(highscores, writer)
 
 
-class Menu:
+class Menu():
     
     def __init__(self):
         pygame.mouse.set_visible(1)
         self.__play_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4, "Play", 205)
-        self.__exit_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/2, "Exit", 195)
-        self.__planets_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4*3, "Choose planet", 650)
-        self.__reset_highscore_button = TextButton(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4, "Reset highscore", 720)
-        self.__weight_size_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2)
-        self.__zoom_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4*3)
+        self.__planets_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/2, "Change planet", 650)
+        self.__reset_highscore_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4*3, "Reset highscore", 720)
+        self.__weight_size_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/18*11)
+        self.__exit_button = TextButton(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4*3, "Exit", 195)
 
     def draw(self):
         self.__play_button.draw()
@@ -429,7 +433,8 @@ class Menu:
         self.__planets_button.draw()
         self.__reset_highscore_button.draw()
         self.__weight_size_slider.draw()
-        self.__zoom_slider.draw()    
+
+           
 
     def loop(self):
         
@@ -459,34 +464,34 @@ class Menu:
                             pass
                     if self.__reset_highscore_button.checkClicked():
                         game.reset_highscore()
+                    if self.__planets_button.checkClicked():
+                        pl
                     if self.__exit_button.checkClicked():
                         pygame.QUIT
                         exit(0)
 
-                if event.type == pygame.MOUSEWHEEL:
-                    print(event.y)
-
             SCREEN.fill(VIOLET)
             self.draw()
-
-            
-            
             self.__weight_size_slider.checkMoved()
-            self.__weight_size_slider.get_value()
-            self.__zoom_slider.checkMoved()
+            Variables.weight_radius = self.__weight_size_slider.get_value()/2
+            if Variables.weight_radius < 5:
+                Variables.weight_radius = 5
 
-
-
-
-
+            if Variables.weight_radius < 10:
+                weight_size_text = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2, "0" + str(int(Variables.weight_radius)), 190)
+            else:
+                weight_size_text = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2, str(int(Variables.weight_radius)), 190)
+            weight_size_text.draw()
+            game.clock.tick(FPS)
             pygame.display.flip()
+            
 
 
-class PlanetMenu:
+class PlanetMenu():
     pass
 
 
-class TextButton:
+class TextButton():
     def __init__(self, x_position, y_position, text, width=523, height=100):
         self.__x_position = x_position - width/2
         self.__y_position = y_position - height/2
@@ -549,6 +554,19 @@ class Slider:
             self.__container_collision = False
 
 
+class Text:
+    def __init__(self, x_position, y_position, text, width=523, height=100):
+        self.__x_position = x_position - width/2
+        self.__y_position = y_position - height/2
+        self.__text = font.render(text, True, WHITE)
+        self.__width = width
+        self.__height = height
+
+    def draw(self):
+        SCREEN.blit(self.__text, (self.__x_position, self.__y_position))
+
+
+variables = Variables()
 game = MainGame()
 
 menu = Menu()
