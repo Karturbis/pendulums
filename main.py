@@ -317,7 +317,6 @@ class EndGame():
                 if score_loose == self.__highscores[i]:
                     break
                 else:
-                    print(f"LOG: The old highscore is: {self.__highscores[i]}")
                     highscore_loose = self.__highscores[i]
                     self.__highscores[i] = score_loose
                     score_loose = highscore_loose
@@ -387,17 +386,13 @@ class EndGame():
         self.__score = 0
         self.__highscores = Files.get_highscores()
         self.calcTime()
-
+        print(f"LOG: Time elapsed: {self.__time_needed}s.")
         if won:
             self.calcScore()
-            print(f"LOG: Time needed: {self.__time_needed}s.")
             self.calcHighscores()
             print(f"LOG: Score: {self.__score}")
-            
-
         else:
             print("LOG: Game lost.")
-            print(f"LOG: Time elapsed: {self.__time_needed}s.")
 
 
 class Files():
@@ -447,8 +442,7 @@ class Menu():
         else:
             weight_size_text = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/8*3, str(int(Variables.weight_radius)), 120)
         weight_size_text.draw()
-        if Variables.weight_radius < 5:
-            Variables.weight_radius = 5
+        Variables.weight_radius += 5 # to avoid the weight size being to small
     
     def changePlanet(self):
         planet_num = random.randint(0, len(gravity_accel)-1)
