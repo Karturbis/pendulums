@@ -62,7 +62,6 @@ FPS = 120
 
 SCREEN = pygame.display.set_mode(WINDOW_SIZE)
 pygame.init()
-pygame.display.set_caption("Pendulums")
 font = pygame.font.Font("freesansbold.ttf", 90)
 font_big = pygame.font.Font("freesansbold.ttf", 200)
 
@@ -252,6 +251,7 @@ class MainGame():
 
     def loop(self):
         pygame.mouse.set_visible(0)
+        pygame.display.set_caption("Pjendol   -   In Game")
         while self.main_game:
 
             # check for gamestates:
@@ -342,8 +342,10 @@ class EndGame():
                         self.done = True
                         break
             if won:
+                pygame.display.set_caption("Pjendol   -   Game won")
                 SCREEN.fill(GREEN)
             else:
+                pygame.display.set_caption("Pjendol   -   Game lost")
                 SCREEN.fill(RED)
             self.draw()
             if self.reload_button.checkClicked():
@@ -456,7 +458,7 @@ class Menu():
 
 
     def loop(self):
-        
+        pygame.display.set_caption("Pjendol   -   Menu")
         done = False
         while not done:
             for event in pygame.event.get():
