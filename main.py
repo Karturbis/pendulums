@@ -69,7 +69,7 @@ font_big = pygame.font.Font("freesansbold.ttf", 200)
 class Variables:
     planet = "earth"
     weight_radius = 5 # min 5, max 50
-    zoom = 220 # min 120, max 220
+    zoom = 190 # min 120, max 220
 
 
 class Target():
@@ -421,10 +421,11 @@ class Menu():
     
     def __init__(self):
         pygame.mouse.set_visible(1)
-        self.__play_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4, "Play", 205)
-        self.__planets_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/2, "Change planet", 650)
+        self.__play_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4, "Play", 205, GREEN)
+        self.__planets_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/2, "Change planet", 665)
         self.__reset_highscore_button = TextButton(WINDOW_SIZE[0]/4, WINDOW_SIZE[1]/4*3, "Reset highscore", 720)
-        self.__weight_size_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/18*11)
+        self.__weight_size_heading = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4, "Weight size:")
+        self.__weight_size_slider = Slider(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2)
         self.__exit_button = TextButton(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4*3, "Exit", 195)
 
     def draw(self):
@@ -432,9 +433,27 @@ class Menu():
         self.__exit_button.draw()
         self.__planets_button.draw()
         self.__reset_highscore_button.draw()
+        self.__weight_size_heading.draw()
         self.__weight_size_slider.draw()
 
-           
+    def calcWeightSize(self):
+        self.__weight_size_slider.checkMoved()
+        Variables.weight_radius = self.__weight_size_slider.get_value()/2
+ 
+        if Variables.weight_radius < 10:
+            weight_size_text = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/8*3, "0" + str(int(Variables.weight_radius)), 120)
+        else:
+            weight_size_text = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/8*3, str(int(Variables.weight_radius)), 120)
+        weight_size_text.draw()
+        if Variables.weight_radius < 5:
+            Variables.weight_radius = 5
+    
+    def changePlanet(self):
+        planet_num = random.randint(0, len(gravity_accel)-1)
+        planets = gravity_accel.keys()
+        Variables.planet = list(planets)[planet_num]
+        print(f"LOG: Planet = {Variables.planet}")
+
 
     def loop(self):
         
@@ -465,44 +484,31 @@ class Menu():
                     if self.__reset_highscore_button.checkClicked():
                         game.reset_highscore()
                     if self.__planets_button.checkClicked():
-                        pl
+                        self.changePlanet()
                     if self.__exit_button.checkClicked():
                         pygame.QUIT
                         exit(0)
 
             SCREEN.fill(VIOLET)
             self.draw()
-            self.__weight_size_slider.checkMoved()
-            Variables.weight_radius = self.__weight_size_slider.get_value()/2
-            if Variables.weight_radius < 5:
-                Variables.weight_radius = 5
-
-            if Variables.weight_radius < 10:
-                weight_size_text = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2, "0" + str(int(Variables.weight_radius)), 190)
-            else:
-                weight_size_text = Text(WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/2, str(int(Variables.weight_radius)), 190)
-            weight_size_text.draw()
+            self.calcWeightSize()
             game.clock.tick(FPS)
             pygame.display.flip()
-            
-
-
-class PlanetMenu():
-    pass
 
 
 class TextButton():
-    def __init__(self, x_position, y_position, text, width=523, height=100):
+    def __init__(self, x_position, y_position, text, width=523, color= BLUE, height=100):
         self.__x_position = x_position - width/2
         self.__y_position = y_position - height/2
         self.__text = text
         self.__width = width
         self.__height = height
+        self.__color = color
         self.button_rect = pygame.rect.Rect((self.__x_position, self.__y_position),(self.__width, self.__height))
 
     def draw(self):
         button_text = font.render(self.__text, True, WHITE)   
-        pygame.draw.rect(SCREEN, BLUE, self.button_rect, 0, 5)
+        pygame.draw.rect(SCREEN, self.__color, self.button_rect, 0, 5)
         SCREEN.blit(button_text, (self.__x_position + 5, self.__y_position + 5))
     
     def checkClicked(self):
@@ -547,7 +553,6 @@ class Slider:
                 if self.__slider_x_position + self.__slider_width/2 > self.__x_right_position:
                     self.__slider_x_position = self.__x_right_position - self.__slider_width/2
                 self.__slider_value = int((((self.__slider_x_position - self.__slider_width/2 - self.__x_position)) / (self.__width-self.__slider_width)*100))
-                print(f"LOG: Slider value: {self.__slider_value}")
         elif self.__container_rect.collidepoint(mouse_position):
             self.__container_collision = True
         else:
