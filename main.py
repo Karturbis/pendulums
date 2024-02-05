@@ -5,6 +5,7 @@ In real life:        In this simulation:
 1 Second        =   1 Second (60 frames)
 
 In the physics calculations, SI-units are used.
+Due to complexity reasons, air resistance is ignored.
 
 If in comments the word 'weight' is used, usually
 the thing at the end of the pendulum, or the thing
@@ -17,6 +18,7 @@ import random # for the setting the target and changing the planet
 import pickle # for saving the highscores to a file
 import pygame # for the display and a lot of other stuff
 from pygame.locals import *
+
 
 # Gravitational Accelerations:
 gravity_accel = {
@@ -145,11 +147,25 @@ class Pendulum():
     def simulate(self):
         """Handles the calculation for displacement,
         velocity, acceleration and angle of the pendulum.
+        Based on the physics formula:
+
+        a = g*sin(s/l)
+
+        where 'a' is the acceleration, 'g' is gravitation in our
+        case 'g' is negative because of the chosen reference system.
+        's' is the displacement on the x-achsis and 'l' is the lenght
+        of the pendulum cord.
+        The velocity is simply the acceleration added to the
+        current velocity every frame. Because all the calculations
+        are done with SI units, the acceleration is diveded by FPS.
+
+        The displacement is the velocity, devided by FPS added to the
+        current displacement.
         """
 
         self.__acceleration_arc = -gravity_accel[Variables.planet] * math.sin(self.__displacement_arc/self.__cord_len)
-        self.__velocity_arc += self.__acceleration_arc/FPS # see comment below:
-        self.__displacement_arc += self.__velocity_arc/FPS # dividing by fps to get seconds in the calculation. E.G if this is done 60 times per second, the displacement is raised by the velocity (m/s²) every second.
+        self.__velocity_arc += self.__acceleration_arc/FPS
+        self.__displacement_arc += self.__velocity_arc/FPS
         self.__angle = self.__displacement_arc/self.__cord_len
         self.__position_meters = [
             self.pendulum_fixpoint[0] + self.__cord_len*math.sin(self.__angle),
@@ -176,7 +192,11 @@ class Throw():
     def simulate(self):
         """This method handles the calculation of the
         oblique throw of the weight. It claculates the
-        position and the velocity of the weight."""
+        position and the velocity of the weight.
+        The calculations are based on the real physics,
+        the velocity in x direction remains the same,
+        the velocity in y direction is accelerated by
+        the gravitational acceleration."""
 
         self.__velocity[1] += gravity_accel[Variables.planet]/FPS
         self.__position_meters[0] += self.__velocity[0]/FPS
@@ -631,29 +651,37 @@ class Menu():
             game.clock.tick(FPS)
 
 
-class TextButton():
+class UserInput():
+    """This is the parent class for Slider and TextButton."""
+    
+    def __init__(self, x_position, y_position, width, height, color):
+        self._x_position = x_position - width/2
+        self._y_position = y_position - height/2
+        self._color = color
+
+
+class TextButton(UserInput):
     """This class represents a simple
     button with text. It takes the parameters:
     x- and y position and text. Optional parameters:
     width, color, text color and height."""
 
     def __init__(self, x_position, y_position, text, width=523, color=BLUE, text_color=WHITE, height=100):
-        self.__x_position = x_position - width/2
-        self.__y_position = y_position - height/2
+        super().__init__(x_position, y_position, width, height, color)
         self.__text = text
         self.__width = width
         self.__height = height
-        self.__color = color
+        
         self.__text_color = text_color
         # Create body of the button:
-        self.button_rect = pygame.rect.Rect((self.__x_position, self.__y_position),(self.__width, self.__height))
+        self.button_rect = pygame.rect.Rect((self._x_position, self._y_position),(self.__width, self.__height))
 
     def draw(self):
         # define text:
         button_text = font.render(self.__text, True, self.__text_color)
         # draw the button:
-        pygame.draw.rect(SCREEN, self.__color, self.button_rect, 0, 5)
-        SCREEN.blit(button_text, (self.__x_position + 5, self.__y_position + 5))
+        pygame.draw.rect(SCREEN, self._color, self.button_rect, 0, 5)
+        SCREEN.blit(button_text, (self._x_position + 5, self._y_position + 5))
     
     def checkClicked(self):
         """This method checks, if the mouse
@@ -669,7 +697,7 @@ class TextButton():
             return False
 
 
-class Slider:
+class Slider(UserInput):
     """This class represents a simple
     slider, that has a value between 0
     and 100. The contructor takes the 
@@ -678,9 +706,8 @@ class Slider:
     and the optional parameters:
     width and height."""
 
-    def __init__(self, x_position, y_position, width=700, height=100):
-        self.__x_position = x_position - width/2
-        self.__y_position = y_position - height/2
+    def __init__(self, x_position, y_position, width=700, color=BLUE, height=100):
+        super().__init__(x_position, y_position, width, height, color)
         self.__x_right_position = x_position + width/2
         self.__slider_width = width/25
         self.__slider_value = 50
@@ -688,14 +715,14 @@ class Slider:
         self.__width = width
         self.__height = height
         # define the container rectangle:
-        self.__container_rect = pygame.rect.Rect((self.__x_position, self.__y_position), (self.__width, self.__height))
+        self.__container_rect = pygame.rect.Rect((self._x_position, self._y_position), (self.__width, self.__height))
         self.__container_collision = False
 
     def draw(self):
         # define the slider rectangle:
-        self.__slider_rect = pygame.rect.Rect((self.__slider_x_position - self.__slider_width/2, self.__y_position), (self.__slider_width, self.__height))
+        self.__slider_rect = pygame.rect.Rect((self.__slider_x_position - self.__slider_width/2, self._y_position), (self.__slider_width, self.__height))
         # draw the slider and container:
-        pygame.draw.rect(SCREEN, BLUE, self.__container_rect, 0, 5)
+        pygame.draw.rect(SCREEN, self._color, self.__container_rect, 0, 5)
         pygame.draw.rect(SCREEN, YELLOW, self.__slider_rect, 0, 5)
 
     def get_value(self):
@@ -718,12 +745,12 @@ class Slider:
                 # set slider position to be same as mouse position:
                 self.__slider_x_position = mouse_position[0]
                 # check for slider being out of the container:
-                if self.__slider_x_position - self.__slider_width/2 < self.__x_position:
-                    self.__slider_x_position = self.__x_position + self.__slider_width/2
+                if self.__slider_x_position - self.__slider_width/2 < self._x_position:
+                    self.__slider_x_position = self._x_position + self.__slider_width/2
                 if self.__slider_x_position + self.__slider_width/2 > self.__x_right_position:
                     self.__slider_x_position = self.__x_right_position - self.__slider_width/2
                 # calculating the slider value:
-                self.__slider_value = int((((self.__slider_x_position - self.__slider_width/2 - self.__x_position)) / (self.__width-self.__slider_width)*100))
+                self.__slider_value = int((((self.__slider_x_position - self.__slider_width/2 - self._x_position)) / (self.__width-self.__slider_width)*100))
         # if mouse stays clicked, while moving out of the container:
         elif self.__container_rect.collidepoint(mouse_position):
             self.__container_collision = True
@@ -731,7 +758,7 @@ class Slider:
             self.__container_collision = False
 
 
-class Text:
+class Text():
     """This class prints the given text
     to the given x- and y position.
     """
