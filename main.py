@@ -653,7 +653,7 @@ class Menu():
 
 class UserInput():
     """This is the parent class for Slider and TextButton."""
-    
+
     def __init__(self, x_position, y_position, width, height, color):
         self._x_position = x_position - width/2
         self._y_position = y_position - height/2
@@ -664,7 +664,8 @@ class TextButton(UserInput):
     """This class represents a simple
     button with text. It takes the parameters:
     x- and y position and text. Optional parameters:
-    width, color, text color and height."""
+    width, color, text color and height.
+    Inherits from UserInput class."""
 
     def __init__(self, x_position, y_position, text, width=523, color=BLUE, text_color=WHITE, height=100):
         super().__init__(x_position, y_position, width, height, color)
@@ -701,10 +702,10 @@ class Slider(UserInput):
     """This class represents a simple
     slider, that has a value between 0
     and 100. The contructor takes the 
-    required parameters:
-    x- and y position-
+    required parameters: x- and y position
     and the optional parameters:
-    width and height."""
+    width and height.
+    Inherits from UserIput class."""
 
     def __init__(self, x_position, y_position, width=700, color=BLUE, height=100):
         super().__init__(x_position, y_position, width, height, color)
