@@ -543,6 +543,24 @@ class EndGame():
             pygame.display.flip()
             game.clock.tick(FPS)
 
+    def checkWin(self, won):
+            """Checks if the player won the game.
+            redirects tasks to other methods."""
+            
+            self.__score = 0
+            # loading the highscores from file:
+            self.__highscores = Files.get_highscores()
+            # Time calculation:
+            self.calcTime()
+            print(f"LOG: Time elapsed: {self.__time_needed}s.")
+            # Checking if the player won or lost:
+            if won:
+                self.calcScore()
+                self.calcHighscores()
+                print(f"LOG: Score: {self.__score}")
+            else:
+                print("LOG: Game lost.")
+
     def draw(self):
         """This method displays the score
         and the highscores, It also draws
@@ -590,24 +608,6 @@ class EndGame():
         self.__reload_button.draw()
         self.__menu_button.draw()
         self.__exit_button.draw()
-
-    def checkWin(self, won):
-        """Checks if the player won the game.
-        redirects tasks to other methods."""
-        
-        self.__score = 0
-        # loading the highscores from file:
-        self.__highscores = Files.get_highscores()
-        # Time calculation:
-        self.calcTime()
-        print(f"LOG: Time elapsed: {self.__time_needed}s.")
-        # Checking if the player won or lost:
-        if won:
-            self.calcScore()
-            self.calcHighscores()
-            print(f"LOG: Score: {self.__score}")
-        else:
-            print("LOG: Game lost.")
 
 
 class Files():
@@ -665,14 +665,6 @@ class Menu():
         self.__exit_button = TextButton(
             WINDOW_SIZE[0]/4*3, WINDOW_SIZE[1]/4*3, "Exit", 195
         )
-
-    def draw(self):
-        self.__play_button.draw()
-        self.__exit_button.draw()
-        self.__planets_button.draw()
-        self.__reset_highscore_button.draw()
-        self.__weight_size_heading.draw()
-        self.__weight_size_slider.draw()
 
     def calcWeightSize(self):
         """This method calculates the size of
@@ -759,6 +751,15 @@ class Menu():
             self.calcWeightSize()
             pygame.display.flip()
             game.clock.tick(FPS)
+    
+    def draw(self):
+        self.__play_button.draw()
+        self.__exit_button.draw()
+        self.__planets_button.draw()
+        self.__reset_highscore_button.draw()
+        self.__weight_size_heading.draw()
+        self.__weight_size_slider.draw()
+
 
 
 class UserInput():
@@ -792,14 +793,7 @@ class TextButton(UserInput):
             (self._x_position, self._y_position),
             (self.__width, self.__height)
         )
-
-    def draw(self):
-        # define text:
-        button_text = font.render(self.__text, True, self.__text_color)
-        # draw the button:
-        pygame.draw.rect(SCREEN, self._color, self.button_rect, 0, 5)
-        SCREEN.blit(button_text, (self._x_position + 5, self._y_position + 5))
-    
+ 
     def checkClicked(self):
         """This method checks, if the mouse
         left click is pressed and the mouse
@@ -812,6 +806,13 @@ class TextButton(UserInput):
             return True
         else:
             return False
+
+    def draw(self):
+        # define text:
+        button_text = font.render(self.__text, True, self.__text_color)
+        # draw the button:
+        pygame.draw.rect(SCREEN, self._color, self.button_rect, 0, 5)
+        SCREEN.blit(button_text, (self._x_position + 5, self._y_position + 5))
 
 
 class Slider(UserInput):
@@ -840,13 +841,6 @@ class Slider(UserInput):
             (self.__width, self.__height)
         )
         self.__container_collision = False
-
-    def draw(self):
-        # define the slider rectangle:
-        self.__slider_rect = pygame.rect.Rect((self.__slider_x_position - self.__slider_width/2, self._y_position), (self.__slider_width, self.__height))
-        # draw the slider and container:
-        pygame.draw.rect(SCREEN, self._color, self.__container_rect, 0, 5)
-        pygame.draw.rect(SCREEN, YELLOW, self.__slider_rect, 0, 5)
 
     def get_value(self):
         return self.__slider_value
@@ -896,6 +890,13 @@ class Slider(UserInput):
             self.__container_collision = True
         else:
             self.__container_collision = False
+
+    def draw(self):
+        # define the slider rectangle:
+        self.__slider_rect = pygame.rect.Rect((self.__slider_x_position - self.__slider_width/2, self._y_position), (self.__slider_width, self.__height))
+        # draw the slider and container:
+        pygame.draw.rect(SCREEN, self._color, self.__container_rect, 0, 5)
+        pygame.draw.rect(SCREEN, YELLOW, self.__slider_rect, 0, 5)
 
 
 class Text():
