@@ -64,7 +64,7 @@ YELLOW = (255, 194, 0)
 WINDOW_SIZE = (1920, 860)
 BACKGROUND_COLOR = BLUE
 TARGET_COLOR = YELLOW
-FPS = 120
+FPS = 128
 SCREEN = pygame.display.set_mode(WINDOW_SIZE)
 pygame.init() # Initialize pygame
 
