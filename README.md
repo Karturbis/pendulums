@@ -1,4 +1,4 @@
-Pendulums is a program to get a feeling forthe physics pendulums and oblique throws.
+Pendulums is a program to get a feeling for the physics of pendulums and oblique throws.
 The player has to release the pendulum weight at the right moment to hit the target.
 One of the aims of this program is to simulate the pendulum movement and the
 oblique throw as realistically as possible. Although it is to note that
