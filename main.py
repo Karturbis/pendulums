@@ -93,7 +93,7 @@ class Target():
             random.randint(0, WINDOW_SIZE[0]-self.__width),
             WINDOW_SIZE[1]-self.__height
         ]
-    
+
     def get_position(self):
         position_meters = [
             self.__position_pixels[0]/Variables.zoom,
@@ -103,7 +103,7 @@ class Target():
 
     def get_width(self):
         return self.__width
-    
+
     def get_area(self):
         return self.__width*self.__height
 
@@ -131,7 +131,7 @@ class Pendulum():
         # displacement on the curved x-achsis (arc):
         self.__displacement_arc = self.__angle * self.__cord_len
         self.simulate()
-    
+
     def get_detached(self):
         return self.__detached
 
@@ -150,7 +150,7 @@ class Pendulum():
         ]
         self.__detached = True
         game.make_throw(self.__position_meters, self.__velocity)
-    
+
     def simulate(self):
         """Handles the calculation for displacement,
         velocity, acceleration and angle of the pendulum.
@@ -228,10 +228,10 @@ class Throw():
         final collision result."""
 
         if self.yCollision() and self. xCollision():
-                print("LOG: Exit game(Won)")
-                game.main_game = False
-                game.endGame(won=True)
-                return True
+            print("LOG: Exit game(Won)")
+            game.main_game = False
+            game.end_game(won=True)
+            return True
         else:
             return False
 
@@ -249,7 +249,7 @@ class Throw():
             return True
         else:
             return False
-    
+
     def xCollision(self):
         """Checks for a collision between the weight
         and the target on the x-achsis.
@@ -267,7 +267,7 @@ class Throw():
             return True
         else:
             return False
-    
+
     def out_of_bound(self):
         """Checks, if the weight is still in the window.
         If the weight is not in the window anymore, it
@@ -280,7 +280,7 @@ class Throw():
             print("LOG: Out of bound on x-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
-            game.endGame(won=False)
+            game.end_game(won=False)
         if (
             self.__position_meters[1]*Variables.zoom < 0
             or self.__position_meters[1]*Variables.zoom > WINDOW_SIZE[1]
@@ -288,7 +288,7 @@ class Throw():
             print("LOG: Out of bound on y-achsis")
             print("LOG: Exit game(Lost)")
             game.main_game = False
-            game.endGame(won=False)
+            game.end_game(won=False)
 
     def draw(self):
         self.__position_pixels = [
@@ -361,7 +361,7 @@ class MainGame():
         the Throw class and passes the given parameters."""
 
         self.throw = Throw(position_meters, velocity)
-    
+
     def reset_highscore(self):
         """This method resets all
         highscores to zero."""
@@ -398,7 +398,7 @@ class MainGame():
                     self.main_game = False
                     pygame.QUIT
                     exit(0)
-                
+
                 # add key control and shortkeys:
                 if event.type == pygame.KEYDOWN:
                     print("LOG: KEYDOWN")
@@ -407,17 +407,17 @@ class MainGame():
                         menu.loop()
                     elif event.key == K_BACKSPACE:
                         self.main_game = False
-                        self.endGame(won=False)
+                        self.end_game(won=False)
                     elif not self.pendulum.get_detached():
-                            self.pendulum.detach()
-                    
+                        self.pendulum.detach()
+
             SCREEN.fill(BACKGROUND_COLOR)
             self.simulate()
             self.draw()
             pygame.display.flip() # update display content
             self.clock.tick(FPS)
 
-    def endGame(self, won):
+    def end_game(self, won):
         """This method initializes
         the end of the game and passes
         the given victory state."""
@@ -470,23 +470,23 @@ class EndGame():
                 /Variables.zoom/Variables.weight_radius
                 /game.target.get_area()/gravity_accel[Variables.planet]*4.2
             )
-    
+
     def calcHighscores(self):
         """This method calculates the highscores
         that are the five best, after the current
         score was calculated."""
-        
+
         # calculation of the hihgscores, by iterating through the list:
         score_loose = self.__score
-        for i in range(len(self.__highscores)):
-                if score_loose < self.__highscores[i]:
-                    continue
-                if score_loose == self.__highscores[i]:
-                    break
-                else:
-                    highscore_loose = self.__highscores[i]
-                    self.__highscores[i] = score_loose
-                    score_loose = highscore_loose
+        for i, _ in enumerate(self.__highscores):
+            if score_loose < self.__highscores[i]:
+                continue
+            if score_loose == self.__highscores[i]:
+                break
+            else:
+                highscore_loose = self.__highscores[i]
+                self.__highscores[i] = score_loose
+                score_loose = highscore_loose
         # setting the new highscores and saving them to the file:
         Files.set_highscores(self.__highscores)
 
@@ -544,22 +544,22 @@ class EndGame():
             game.clock.tick(FPS)
 
     def checkWin(self, won):
-            """Checks if the player won the game.
-            redirects tasks to other methods."""
-            
-            self.__score = 0
-            # loading the highscores from file:
-            self.__highscores = Files.get_highscores()
-            # Time calculation:
-            self.calcTime()
-            print(f"LOG: Time elapsed: {self.__time_needed}s.")
-            # Checking if the player won or lost:
-            if won:
-                self.calcScore()
-                self.calcHighscores()
-                print(f"LOG: Score: {self.__score}")
-            else:
-                print("LOG: Game lost.")
+        """Checks if the player won the game.
+        redirects tasks to other methods."""
+
+        self.__score = 0
+        # loading the highscores from file:
+        self.__highscores = Files.get_highscores()
+        # Time calculation:
+        self.calcTime()
+        print(f"LOG: Time elapsed: {self.__time_needed}s.")
+        # Checking if the player won or lost:
+        if won:
+            self.calcScore()
+            self.calcHighscores()
+            print(f"LOG: Score: {self.__score}")
+        else:
+            print("LOG: Game lost.")
 
     def draw(self):
         """This method displays the score
@@ -586,7 +586,7 @@ class EndGame():
             (WINDOW_SIZE[0]/32*21, WINDOW_SIZE[1]/(6*5))
         )
         # Highlighting the highscore, equal to the scored score:
-        for i in range(len(self.__highscores)):
+        for i, _ in enumerate(self.__highscores):
             if self.__highscores[i] == self.__score and self.__score != 0:
                 text_highscore = font.render(
                     str(self.__highscores[i]), True, YELLOW
@@ -643,7 +643,7 @@ class Menu():
     """The Menu class displays the game
     menu, for example at the start of the
     game. It has multiple buttons and a slider."""
-    
+
     def __init__(self):
         pygame.mouse.set_visible(1) # set the mouse visible
         # Initializing the buttons and sliders:
@@ -671,7 +671,7 @@ class Menu():
         the weight, depending on the value
         of the weight size slider."""
 
-        self.__weight_size_slider.checkMoved()
+        self.__weight_size_slider.check_moved()
         Variables.weight_radius = self.__weight_size_slider.get_value()/2
         # making sure the number always has two digits:
         if Variables.weight_radius < 10:
@@ -686,11 +686,11 @@ class Menu():
             )
         weight_size_text.draw()
         Variables.weight_radius += 5 # to avoid the weight size being to small
-    
+
     def changePlanet(self):
         """This method sets the 'planet'
         variable to a random, accepted value."""
-        
+
         # Generate a random index for the gravity_accel dict:
         planet_num = random.randint(0, len(gravity_accel)-1)
         # Mapping the index to a key:
@@ -751,7 +751,7 @@ class Menu():
             self.calcWeightSize()
             pygame.display.flip()
             game.clock.tick(FPS)
-    
+
     def draw(self):
         self.__play_button.draw()
         self.__exit_button.draw()
@@ -786,14 +786,14 @@ class TextButton(UserInput):
         self.__text = text
         self.__width = width
         self.__height = height
-        
+
         self.__text_color = text_color
         # Create body of the button:
         self.button_rect = pygame.rect.Rect(
             (self._x_position, self._y_position),
             (self.__width, self.__height)
         )
- 
+
     def checkClicked(self):
         """This method checks, if the mouse
         left click is pressed and the mouse
@@ -844,8 +844,8 @@ class Slider(UserInput):
 
     def get_value(self):
         return self.__slider_value
-    
-    def checkMoved(self):
+
+    def check_moved(self):
         """This method checks, if the slider
         was moved. If the slider would be moved
         outside the container, it stays in the 
